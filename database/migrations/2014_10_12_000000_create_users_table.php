@@ -18,6 +18,12 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('cuil')->unique();            
             $table->string('password');
+            $table->string('national_md_lic')->nuleable();
+            $table->string('provincial_md_lic')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('phone_opt')->nullable();
+            $table->string('speciality')->nullable();
+            $table->string('picture')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
