@@ -59,6 +59,24 @@ class UserService
         if (isset($data['password'])) {
             $user->password = Hash::make($data['password']);
         }
+        if (isset($data['national_md_lic'])) {
+            $user->national_md_lic = $data['national_md_lic'];
+        }
+        if (isset($data['provincial_md_lic'])) {
+            $user->provincial_md_lic = $data['provincial_md_lic'];
+        }
+        if (isset($data['phone'])) {
+            $user->phone = $data['phone'];
+        }
+        if (isset($data['phone_opt'])) {
+            $user->phone_opt = $data['phone_opt'];
+        }
+        if (isset($data['speciality'])) {
+            $user->speciality = $data['speciality'];
+        }
+        if (isset($data['picture'])) {
+            $user->picture = $data['picture'];
+        }
 
         $user->save();
 
