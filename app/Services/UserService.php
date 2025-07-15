@@ -5,9 +5,12 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class UserService
 {
+
+    
     /**
      * Obtiene todos los usuarios.
      *
@@ -38,12 +41,29 @@ class UserService
      */
     public function updateUser(int $id, array $data): ?User
     {
-        
         $user = $this->findUserById($id);
 
         if (!$user) {
             return null;
         }
+        // Validación de datos
+        if (empty($data['national_md_lic']) && empty($data['provincial_md_lic'])) {
+            throw ValidationException::withMessages([
+            'license' => ['National or Provincial medical license is required.'],
+            ]);
+        }
+        if (User::where('cuil', $data['cuil'])->where('id', '!=', $id)->exists() || User::where('email', $data['email'])->where('id', '!=', $id)->exists()) {
+            throw ValidationException::withMessages([
+            'license' => ['Cuil or email already registered.'],]); 
+        }
+        if (User::where('national_md_lic', $data['national_md_lic'])->where('id', '!=', $id)->exists() || User::where('provincial_md_lic', $data['provincial_md_lic'])->where('id', '!=', $id)->exists()) {
+            throw ValidationException::withMessages([
+            'license' => ['National or Provincial medical license already registered.'],]); 
+        }
+               
+
+
+        // Actualización de los campos del usuario
         if (isset($data['name'])) {
             $user->name = $data['name'];
         }
