@@ -4,7 +4,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PatientController;
+
 /*
+
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
@@ -35,6 +38,16 @@ Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'users'], function () {
     Route::put('/{id}', [UserController::class, 'update']); 
     Route::delete('/{id}', [UserController::class, 'destroy']);
 });
+
+// Rutas protegidas para la gestión de Pacientes
+Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'patients'], function () {
+    Route::get('/', [PatientController::class, 'index']); 
+    Route::get('/{id}', [PatientController::class, 'show']); 
+    Route::put('/{id}', [PatientController::class, 'update']); 
+    Route::delete('/{id}', [PatientController::class, 'destroy']);
+    Route::post('/', [PatientController::class, 'store']); // Para crear un nuevo paciente
+});
+
 // Ejemplo de una ruta protegida adicional
 Route::middleware(['jwt.auth'])->get('/user-profile', function (Request $request) {
     return response()->json(['message' => '¡Bienvenido! Eres un usuario autenticado.', 'user' => $request->user()]);
