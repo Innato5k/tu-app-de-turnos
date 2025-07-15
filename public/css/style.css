@@ -1,0 +1,18 @@
+/* Estilos personalizados para el cuerpo y el fondo */
+body {
+    font-family: 'Inter', sans-serif;
+    /* Fondo con un degradado suave de azul claro a verde menta */
+    background: linear-gradient(to right bottom, #e0f7fa, #e8f5e9); /* Muy ligero azul cian a muy ligero verde */
+}
+
+/* Ajustes para el spinner de carga del modal */
+#tipLoading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3em;
+}
+
+/* Ajuste para el color de texto del botón de inicio de sesión */
+.btn-info.text-white {
+    color: #fff !important; /* Asegura que el texto sea blanco sobre el botón info */
+}
