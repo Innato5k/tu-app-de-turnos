@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth; 
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Token;
+use Trowable;
+
 
 class AuthService
 {
@@ -18,12 +20,28 @@ class AuthService
      */
     public function registerUser(array $data): ?User
     {
+        if (empty($data['national_md_lic']) && empty($data['provincial_md_lic'])) {
+            throw ValidationException::withMessages([
+            'license' => ['National or Provincial medical license is required.'],
+            ]);
+        }
+        if (User::where('national_md_lic', $data['national_md_lic'])->exists() || User::where('provincial_md_lic', $data['provincial_md_lic'])->exists()) {
+            throw ValidationException::withMessages([
+            'license' => ['National or Provincial medical license already registered.'],]); 
+        }
+        
         return User::create([
             'name' => $data['name'],
             'last_name' => $data['lastname'],
             'cuil' => $data['cuil'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'national_md_lic' => $data['national_md_lic'] ?? null,
+            'provincial_md_lic' => $data['provincial_md_lic'] ?? null,
+            'phone' => $data['phone'] ?? null,
+            'phone_opt' => $data['phone_opt'] ?? null,
+            'speciality' => $data['speciality'] ?? null,
+            'picture' => $data['picture'] ?? null,
         ]);
     }
 

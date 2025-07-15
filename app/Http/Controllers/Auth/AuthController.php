@@ -38,7 +38,13 @@ class AuthController extends Controller
             'email' => 'required|email|unique:users,email', 
             'cuil' => 'required|unique:users,cuil',     
             'password' => 'required|string|min:8|confirmed',
-        ]); 
+            'national_md_lic' => 'nullable|string|max:255',
+            'provincial_md_lic' => 'nullable|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'phone_opt' => 'nullable|string|max:20',
+            'speciality' => 'nullable|string|max:255',
+            'picture' => 'nullable|image|max:2048',
+        ]);         
 
         // Llama al servicio para registrar el usuario
         if ($user = $this->authService->registerUser($request->all())) {

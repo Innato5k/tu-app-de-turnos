@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('email')->unique();
             $table->string('cuil')->unique();            
-            $table->string('password');
-            $table->string('national_md_lic')->nuleable();
+            $table->string('password');            
             $table->string('provincial_md_lic')->nullable();
+            $table->string('national_md_lic')->nullable();
             $table->string('phone')->nullable();
             $table->string('phone_opt')->nullable();
             $table->string('speciality')->nullable();
