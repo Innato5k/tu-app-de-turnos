@@ -10,7 +10,15 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 // Ruta para procesar el envío del formulario de login
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
-// Ruta de ejemplo para el dashboard (a donde redirigirás)
+
 Route::get('/dashboard', function () {
-    return view('/dashboard'); // Esto sería tu vista real del dashboard
-})->name('dashboard'); // Asegúrate de que solo usuarios autenticados puedan acceder
+    return view('/dashboard'); 
+})->name('dashboard');
+
+Route::get('/patients', function () {
+    return view('patients.index');
+})->name('patients.index'); 
+
+Route::get('/patients/create', function () {
+    return view('patients.create');
+})->name('patients.create'); 

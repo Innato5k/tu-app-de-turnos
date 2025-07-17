@@ -30,13 +30,13 @@
                 <div  class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a  id="linkInicio" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="#">Inicio</a>
+                            <a  id="linkInicio" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/dashboard">Inicio</a>
                         </li>
                         <li class="nav-item">
                             <a  id="linkMisTurnos" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="#">Mis Turnos</a>
                         </li>
                         <li class="nav-item">
-                            <a id="linkPacientes" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="#">Mis Pacientes</a>
+                            <a id="linkPacientes" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/patients">Mis Pacientes</a>
                         </li>
                         <li class="nav-item">
                             <a  id="linkContactos" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="#">Contacto</a>

@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Models\Patient;
+use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PatientService
 {
@@ -51,9 +53,12 @@ class PatientService
      *
      * @return \Illuminate\Database\Eloquent\Collection<Patient>
      */
-    public function getAllPatients(): Collection
+    public function getAllPatients(Request $request): LengthAwarePaginator 
     {
-        $pacientes = Patient::all();
+        $perPage = $request->input('per_page', 10); // Número de pacientes por página
+        $page = $request->input('page', 1); // Página actual        
+        // $pacientes = Patient::paginate($perPage, ['*'], 'page', $page)->sortBy('name');
+        $pacientes = Patient::orderBy('name')->paginate($perPage, ['*'], 'page', $page);
         if ($pacientes->isEmpty()) {
             throw new \Exception('No patients found');
         }

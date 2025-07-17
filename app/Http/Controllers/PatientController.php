@@ -21,9 +21,9 @@ class PatientController extends Controller
         $this->middleware('jwt.auth'); // Asegura que las rutas estén protegidas
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $patients = $this->patientService->getAllPatients();
+        $patients = $this->patientService->getAllPatients($request);
         return response()->json($patients);
     }
 
@@ -32,7 +32,7 @@ class PatientController extends Controller
      */
     public function create(array $data) : ?Patient
     {
-        
+        return null;
     }
 
     /**
