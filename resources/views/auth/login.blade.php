@@ -1,8 +1,6 @@
-@extends('layouts.app') {{-- Extiende el layout principal --}}
-
-@section('title', 'Iniciar Sesión') {{-- Define el título de esta página --}}
-
-@section('content') {{-- Abre la sección 'content' definida en el layout --}}
+@extends('layouts.app')
+@section('title', 'Iniciar Sesión') 
+@section('content') 
    <div class="bg-white p-4 rounded-3 shadow-lg w-100" style="max-width: 450px;">
             <div class="text-center mb-3">
                 <!-- Icono o logo representativo de psicología -->
@@ -18,6 +16,7 @@
             </div>
 
             <form id="loginForm">
+                @csrf 
                 <div class="mb-3">
                     <label for="email" class="form-label text-dark small">
                         Correo Electrónico
@@ -27,7 +26,8 @@
                         id="email"
                         name="email"
                         placeholder="tu@correo.com"
-                        class="form-control form-control-sm"
+                        class="form-control form-control-sm @error('email') is-invalid @enderror"
+                        value="{{ old('email') }}"
                         required
                     >
                 </div>
@@ -40,7 +40,7 @@
                         id="password"
                         name="password"
                         placeholder="••••••••"
-                        class="form-control form-control-sm"
+                        class="form-control form-control-sm @error('password') is-invalid @enderror"
                         required
                     >
                 </div>
@@ -49,7 +49,7 @@
                     <div class="form-check small">
                         <input
                             id="remember-me"
-                            name="remember-me"
+                            name="remember"
                             type="checkbox"
                             class="form-check-input"
                         >
@@ -67,7 +67,7 @@
                 <div>
                     <button
                         type="submit"
-                        class="btn btn-info w-100 py-2 fs-6 fw-semibold text-white"
+                        class="btn btn-info w-100 py-2 fs-6 fw-semibold text-white" id="loginButton"
                     >
                         Iniciar Sesión
                     </button>
@@ -90,28 +90,5 @@
 @endsection {{-- Cierra la sección 'content' --}}
 
 @section('scripts') {{-- Abre la sección 'scripts' para scripts específicos --}}
-    <script type="module">        
-        const loginForm = document.getElementById('loginForm');
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const appMessage = document.getElementById('appMessage');
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const email = emailInput.value;
-            const password = passwordInput.value;
-
-            if (email && password) {
-                appMessage.textContent = 'Inicio de sesión exitoso. ¡Bienvenido!';
-                appMessage.classList.remove('text-danger');
-                appMessage.classList.add('text-success');
-            } else {
-                appMessage.textContent = 'Por favor, introduce tu correo y contraseña.';
-                appMessage.classList.remove('text-success');
-                appMessage.classList.add('text-danger');
-                wellnessTipContainer.classList.add('d-none');
-            }
-        });        
-    </script>
+    <script type="module" src="{{ asset('js/login.js') }}"></script>
 @endsection {{-- Cierra la sección 'scripts' --}}
