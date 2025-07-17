@@ -43,7 +43,7 @@ class PatientService
             'city' => $data['city'] ?? null,
             'province' => $data['province'] ?? null,
             'postal_code' => $data['postal_code'] ?? null,
-            'medical_coerage' => $data['medical_coerage'] ?? null,
+            'medical_coverage' => $data['medical_coverage'] ?? null,
         ]);
     }           
 
@@ -139,8 +139,8 @@ class PatientService
         if (isset($data['postal_code'])) {
             $Patient->postal_code = $data['postal_code'];
         }
-        if (isset($data['medical_coerage'])) {
-            $Patient->medical_coerage = $data['medical_coerage'];
+        if (isset($data['medical_coverage'])) {
+            $Patient->medical_coverage = $data['medical_coverage'];
         }
 
 
