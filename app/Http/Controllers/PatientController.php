@@ -54,7 +54,7 @@ class PatientController extends Controller
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
-            'medical_coerage' => 'nullable|string|max:255',
+            'medical_coverage' => 'nullable|string|max:255',
         ]);
 
         return $this->patientService->registerPatient($request->all());
@@ -65,10 +65,11 @@ class PatientController extends Controller
      */
     public function show(string $id)
     {
+        $id = (int)$id; 
         $patient = $this->patientService->findPatientById($id);
 
         if (!$patient) {
-            return response()->json(['message' => 'Patient not found'], 404);
+            return response()->json(['message' => 'Patient not found   '.$id], 404);
         }
 
         return response()->json($patient);
@@ -93,7 +94,7 @@ class PatientController extends Controller
             'cuil' => [
                 'sometimes',
                 'string',
-                'max:20',
+                'max:11',
                 Rule::unique('patients')->ignore($id),
             ],
             'email' => [
@@ -110,7 +111,7 @@ class PatientController extends Controller
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
-            'medical_coerage' => 'nullable|string|max:255',
+            'medical_coverage' => 'nullable|string|max:255',
         ]);
         $patient = $this->patientService->updatePatient($id, $request->all());
         if (!$patient) {

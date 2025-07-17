@@ -22,3 +22,7 @@ Route::get('/patients', function () {
 Route::get('/patients/create', function () {
     return view('patients.create');
 })->name('patients.create'); 
+
+Route::get('/patients/{id}/edit/', function ($id) {
+    return view('patients.edit', ['id' => $id]);
+})->name('patients.edit');

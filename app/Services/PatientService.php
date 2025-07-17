@@ -102,14 +102,18 @@ class PatientService
         if (isset($data['lastname'])) {
             $Patient->last_name = $data['lastname'];
         }
-        if (isset($data['cuil'])) {
-            $Patient->cuil = $data['cuil'];
+        if (isset($data['cuil']) && filter_var($data['cuil'], FILTER_VALIDATE_INT) !== false) {
+            $Patient->cuil = (int)$data['cuil'];
         }
         if (isset($data['email'])) {
             $Patient->email = $data['email'];
         }
         if (isset($data['birth_date'])) {
-            $Patient->birth_date = $data['birth_date'];
+            // Si viene en formato datetime, extrae solo la fecha
+            $date = substr($data['birth_date'], 0, 10); // "YYYY-MM-DD"
+            if ($this->isValidDate($date, 'Y-m-d')) {
+                $Patient->birth_date = $date;
+            }
         }
         if (isset($data['phone'])) {
             $Patient->phone = $data['phone'];
@@ -163,5 +167,12 @@ class PatientService
         }
 
         return $Patient->delete();
+    }
+
+   
+    private function isValidDate($date, $format = 'Y-m-d')
+    {
+        $d = \DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) === $date;
     }
 }
