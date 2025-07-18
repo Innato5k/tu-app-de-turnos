@@ -28,5 +28,7 @@ class Patient extends Model
             'province',
             'postal_code',
             'medical_coerage',
+            'is_active',
+            'is_deleted',
     ];
 }

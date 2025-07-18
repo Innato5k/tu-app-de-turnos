@@ -4,8 +4,6 @@ namespace App\Services;
 
 use App\Models\Patient;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -99,8 +97,8 @@ class PatientService
         if (isset($data['name'])) {
             $Patient->name = $data['name'];
         }
-        if (isset($data['lastname'])) {
-            $Patient->last_name = $data['lastname'];
+        if (isset($data['last_name'])) {
+            $Patient->last_name = $data['last_name'];
         }
         if (isset($data['cuil']) && filter_var($data['cuil'], FILTER_VALIDATE_INT) !== false) {
             $Patient->cuil = (int)$data['cuil'];
@@ -166,9 +164,24 @@ class PatientService
             return false;
         }
 
-        return $Patient->delete();
+        return $Patient->is_deleted = true; // Marca el paciente como eliminado
     }
 
+    public function changeState(int $id): bool
+    {
+        //TODO: Implementar lógica para eliminar un paciente soft delete.
+
+
+        $Patient = $this->findPatientById($id);
+
+        if (!$Patient) {
+             return false;
+        }
+         $Patient->is_active = !$Patient->is_active;
+        
+
+        return true; 
+    }
    
     private function isValidDate($date, $format = 'Y-m-d')
     {

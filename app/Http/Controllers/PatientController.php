@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\PatientService; // 
+use App\Services\PatientService;
 use App\Models\Patient; 
 use Illuminate\Validation\Rule;
 
@@ -90,7 +90,7 @@ class PatientController extends Controller
     {
         $request->validate([
             'name' => 'sometimes|string|max:255',
-            'lastname' => 'sometimes|string|max:255',
+            'last_name' => 'sometimes|string|max:255',
             'cuil' => [
                 'sometimes',
                 'string',
@@ -112,6 +112,7 @@ class PatientController extends Controller
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'medical_coverage' => 'nullable|string|max:255',
+            'is_active' => 'sometimes|boolean',
         ]);
         $patient = $this->patientService->updatePatient($id, $request->all());
         if (!$patient) {
@@ -123,6 +124,16 @@ class PatientController extends Controller
         ]);
     }
 
+    public function changeState(string $id)
+    {
+        $state = $this->patientService->changeState($id);
+
+        if ($state) {
+            return response()->json(['message' => 'Patient has been modified successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Patient not found'], 404);
+        }
+    }
     /**
      * Remove the specified resource from storage.
      */
