@@ -13,11 +13,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('patients', function (Blueprint $table) {
-            $table->boolean('is_deleted')->default(true)->after('is_active');
+            $table->boolean('is_active')->default(true)->after('medical_coerage');
         });
-        DB::table('patients')->update(['is_deleted' => false]);
+        DB::table('patients')->update(['is_active' => true]);
         schema::table('patients', function (Blueprint $table) {
-            $table->boolean('is_deleted')->nullable(false)->default(false)->change();
+            $table->boolean('is_active')->nullable(false)->default(true)->change();
         });
     }
 
@@ -27,7 +27,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('patients', function (Blueprint $table) {
-            $table->dropColumn('is_deleted');
+            $table->dropColumn('is_active');
         });
     }
 };

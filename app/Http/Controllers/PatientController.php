@@ -23,7 +23,21 @@ class PatientController extends Controller
 
     public function index(Request $request)
     {
-        $patients = $this->patientService->getAllPatients($request);
+        // Obtiene el término de búsqueda de la URL (parámetro 'search')
+        $searchQuery = $request->query('search');
+        // Obtiene el número de elementos por página (parámetro 'per_page')
+        $perPage = $request->query('per_page', 10); // Valor por defecto 10
+        // Obtiene la página actual (parámetro 'page')
+        $page = $request->query('page', 1); // Valor por defecto 1
+
+        // Llama al servicio para obtener los pacientes filtrados y paginados
+        // MODIFICADO: Pasando $perPage, $page y $searchQuery
+        $patients = $this->patientService->getAllPatients($request , $searchQuery, $orderBy = 'name');
+
+        // Ya no necesitas el if ($pacientes->isEmpty()) y lanzar una excepción aquí,
+        // porque el paginador de Laravel ya devuelve una colección vacía si no hay resultados,
+        // lo cual es una respuesta JSON válida para el frontend.
+
         return response()->json($patients);
     }
 
@@ -55,6 +69,7 @@ class PatientController extends Controller
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'medical_coverage' => 'nullable|string|max:255',
+            'is_active' => 'sometimes|boolean', 
         ]);
 
         return $this->patientService->registerPatient($request->all());

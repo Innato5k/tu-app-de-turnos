@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const medicalCoverageInput = document.getElementById('medical_coverage');
     const savePatientButton = document.getElementById('savePatientButton');
     const patientMessage = document.getElementById('patientMessage');
+    const isActiveInput = document.getElementById('is_active');
 
     // Función para obtener el token JWT del localStorage
     function getAuthToken() {
@@ -126,6 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             provinceInput.value = patient.province || '';
             postalCodeInput.value = patient.postal_code || '';
             medicalCoverageInput.value = patient.medical_coverage || '';
+            isActiveInput.checked = patient.is_active;           
 
 
             showMessage(''); // Limpiar mensaje de carga
@@ -171,6 +173,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             province: provinceInput.value,
             postal_code: postalCodeInput.value,
             medical_coverage: medicalCoverageInput.value,
+            is_active: isActiveInput.checked, 
+            
             // Si hay otros campos, agrégalos aquí
         };
 

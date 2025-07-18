@@ -6,6 +6,8 @@
 <div class="container py-2 ">
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h1 class="fs-3 fw-bold text-dark">Editar Paciente</h1>
+
+        
        
         <a href="{{ route('patients.index') }}" class="btn btn-secondary fw-semibold px-3">
             Volver al Listado
@@ -18,7 +20,7 @@
                 @method('PUT') {{-- Método PUT para actualizar recursos --}}
                   <div class=" form-check form-switch form-check-inline">
                         <label for="is_active" class="form-label text-dark small ">Estado</label>    
-                        <input class="form-check-input " type="checkbox" id="flexSwitchCheckDefault">                        
+                        <input class="form-check-input " type="checkbox" id="is_active">                        
                     </div>
 
                 <div class="row d-flex justify-content-between">

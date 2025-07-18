@@ -51,16 +51,25 @@ class PatientService
      *
      * @return \Illuminate\Database\Eloquent\Collection<Patient>
      */
-    public function getAllPatients(Request $request): LengthAwarePaginator 
+    public function getAllPatients(Request $request, ?string $searchQuery = null , ?string $orderBy = null): LengthAwarePaginator 
     {
+        $query = Patient::query();
+        if ($searchQuery) {
+            $query->where(function ($q) use ($searchQuery) {
+                $q->where('name', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('email', 'like', '%' . $searchQuery . '%');
+            });
+        }
+        
+        if ($orderBy) {
+            $query->orderBy($orderBy);
+        }
+
         $perPage = $request->input('per_page', 10); // Número de pacientes por página
         $page = $request->input('page', 1); // Página actual        
         // $pacientes = Patient::paginate($perPage, ['*'], 'page', $page)->sortBy('name');
-        $pacientes = Patient::orderBy('name')->paginate($perPage, ['*'], 'page', $page);
-        if ($pacientes->isEmpty()) {
-            throw new \Exception('No patients found');
-        }
-        return $pacientes;
+        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -140,6 +149,9 @@ class PatientService
         if (isset($data['medical_coverage'])) {
             $Patient->medical_coverage = $data['medical_coverage'];
         }
+        if (isset($data['is_active'])) {
+            $Patient->is_active = $data['is_active'];
+        }
 
 
         $Patient->save();
@@ -163,6 +175,8 @@ class PatientService
         if (!$Patient) {
             return false;
         }
+        $Patient->delete(); // Utiliza soft delete para marcar el paciente como eliminado
+
 
         return $Patient->is_deleted = true; // Marca el paciente como eliminado
     }
