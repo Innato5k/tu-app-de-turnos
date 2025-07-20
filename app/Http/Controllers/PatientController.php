@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Services\PatientService; // 
+use App\Services\PatientService;
 use App\Models\Patient; 
 use Illuminate\Validation\Rule;
 
@@ -21,9 +21,23 @@ class PatientController extends Controller
         $this->middleware('jwt.auth'); // Asegura que las rutas estén protegidas
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $patients = $this->patientService->getAllPatients();
+        // Obtiene el término de búsqueda de la URL (parámetro 'search')
+        $searchQuery = $request->query('search');
+        // Obtiene el número de elementos por página (parámetro 'per_page')
+        $perPage = $request->query('per_page', 10); // Valor por defecto 10
+        // Obtiene la página actual (parámetro 'page')
+        $page = $request->query('page', 1); // Valor por defecto 1
+
+        // Llama al servicio para obtener los pacientes filtrados y paginados
+        // MODIFICADO: Pasando $perPage, $page y $searchQuery
+        $patients = $this->patientService->getAllPatients($request , $searchQuery, $orderBy = 'name');
+
+        // Ya no necesitas el if ($pacientes->isEmpty()) y lanzar una excepción aquí,
+        // porque el paginador de Laravel ya devuelve una colección vacía si no hay resultados,
+        // lo cual es una respuesta JSON válida para el frontend.
+
         return response()->json($patients);
     }
 
@@ -32,7 +46,7 @@ class PatientController extends Controller
      */
     public function create(array $data) : ?Patient
     {
-        
+        return null;
     }
 
     /**
@@ -42,7 +56,7 @@ class PatientController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'cuil' => 'required|string|max:20|unique:patients,cuil',
             'email' => 'required|email|unique:patients,email',
             'phone' => 'nullable|string|max:20',
@@ -54,7 +68,8 @@ class PatientController extends Controller
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
-            'medical_coerage' => 'nullable|string|max:255',
+            'medical_coverage' => 'nullable|string|max:255',
+            'is_active' => 'sometimes|boolean', 
         ]);
 
         return $this->patientService->registerPatient($request->all());
@@ -65,10 +80,11 @@ class PatientController extends Controller
      */
     public function show(string $id)
     {
+        $id = (int)$id; 
         $patient = $this->patientService->findPatientById($id);
 
         if (!$patient) {
-            return response()->json(['message' => 'Patient not found'], 404);
+            return response()->json(['message' => 'Patient not found   '.$id], 404);
         }
 
         return response()->json($patient);
@@ -89,11 +105,11 @@ class PatientController extends Controller
     {
         $request->validate([
             'name' => 'sometimes|string|max:255',
-            'lastname' => 'sometimes|string|max:255',
+            'last_name' => 'sometimes|string|max:255',
             'cuil' => [
                 'sometimes',
                 'string',
-                'max:20',
+                'max:11',
                 Rule::unique('patients')->ignore($id),
             ],
             'email' => [
@@ -110,7 +126,8 @@ class PatientController extends Controller
             'city' => 'nullable|string|max:100',
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
-            'medical_coerage' => 'nullable|string|max:255',
+            'medical_coverage' => 'nullable|string|max:255',
+            'is_active' => 'sometimes|boolean',
         ]);
         $patient = $this->patientService->updatePatient($id, $request->all());
         if (!$patient) {
@@ -122,6 +139,16 @@ class PatientController extends Controller
         ]);
     }
 
+    public function changeState(string $id)
+    {
+        $state = $this->patientService->changeState($id);
+
+        if ($state) {
+            return response()->json(['message' => 'Patient has been modified successfully'], 200);
+        } else {
+            return response()->json(['message' => 'Patient not found'], 404);
+        }
+    }
     /**
      * Remove the specified resource from storage.
      */

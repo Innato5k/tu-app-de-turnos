@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Models\Patient;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PatientService
 {
@@ -26,10 +26,16 @@ class PatientService
                 'cuil/email' => ['Cuil and email are required.'],
             ]);
         }
+        $data['birth_date'] = substr($data['birth_date'], 0, 10); // "YYYY-MM-DD"
+            if (!$this->isValidDate($data['birth_date'], 'Y-m-d')) {
+                throw ValidationException::withMessages([
+                    'birth_date' => ['Invalid date format for birth_date. Expected format: YYYY-MM-DD'],
+                ]);
+            }
 
         return Patient::create([
             'name' => $data['name'],
-            'last_name' => $data['lastname'],
+            'last_name' => $data['last_name'],
             'cuil' => $data['cuil'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,
@@ -41,7 +47,7 @@ class PatientService
             'city' => $data['city'] ?? null,
             'province' => $data['province'] ?? null,
             'postal_code' => $data['postal_code'] ?? null,
-            'medical_coerage' => $data['medical_coerage'] ?? null,
+            'medical_coverage' => $data['medical_coverage'] ?? null,
         ]);
     }           
 
@@ -51,13 +57,25 @@ class PatientService
      *
      * @return \Illuminate\Database\Eloquent\Collection<Patient>
      */
-    public function getAllPatients(): Collection
+    public function getAllPatients(Request $request, ?string $searchQuery = null , ?string $orderBy = null): LengthAwarePaginator 
     {
-        $pacientes = Patient::all();
-        if ($pacientes->isEmpty()) {
-            throw new \Exception('No patients found');
+        $query = Patient::query();
+        if ($searchQuery) {
+            $query->where(function ($q) use ($searchQuery) {
+                $q->where('name', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('email', 'like', '%' . $searchQuery . '%');
+            });
         }
-        return $pacientes;
+        
+        if ($orderBy) {
+            $query->orderBy($orderBy);
+        }
+
+        $perPage = $request->input('per_page', 10); // Número de pacientes por página
+        $page = $request->input('page', 1); // Página actual        
+        // $pacientes = Patient::paginate($perPage, ['*'], 'page', $page)->sortBy('name');
+        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -94,17 +112,21 @@ class PatientService
         if (isset($data['name'])) {
             $Patient->name = $data['name'];
         }
-        if (isset($data['lastname'])) {
-            $Patient->last_name = $data['lastname'];
+        if (isset($data['last_name'])) {
+            $Patient->last_name = $data['last_name'];
         }
-        if (isset($data['cuil'])) {
-            $Patient->cuil = $data['cuil'];
+        if (isset($data['cuil']) && filter_var($data['cuil'], FILTER_VALIDATE_INT) !== false) {
+            $Patient->cuil = (int)$data['cuil'];
         }
         if (isset($data['email'])) {
             $Patient->email = $data['email'];
         }
         if (isset($data['birth_date'])) {
-            $Patient->birth_date = $data['birth_date'];
+            // Si viene en formato datetime, extrae solo la fecha
+            $date = substr($data['birth_date'], 0, 10); // "YYYY-MM-DD"
+            if ($this->isValidDate($date, 'Y-m-d')) {
+                $Patient->birth_date = $date;
+            }
         }
         if (isset($data['phone'])) {
             $Patient->phone = $data['phone'];
@@ -130,8 +152,11 @@ class PatientService
         if (isset($data['postal_code'])) {
             $Patient->postal_code = $data['postal_code'];
         }
-        if (isset($data['medical_coerage'])) {
-            $Patient->medical_coerage = $data['medical_coerage'];
+        if (isset($data['medical_coverage'])) {
+            $Patient->medical_coverage = $data['medical_coverage'];
+        }
+        if (isset($data['is_active'])) {
+            $Patient->is_active = $data['is_active'];
         }
 
 
@@ -156,7 +181,31 @@ class PatientService
         if (!$Patient) {
             return false;
         }
+        $Patient->delete(); // Utiliza soft delete para marcar el paciente como eliminado
 
-        return $Patient->delete();
+
+        return $Patient->is_deleted = true; // Marca el paciente como eliminado
+    }
+
+    public function changeState(int $id): bool
+    {
+        //TODO: Implementar lógica para eliminar un paciente soft delete.
+
+
+        $Patient = $this->findPatientById($id);
+
+        if (!$Patient) {
+             return false;
+        }
+         $Patient->is_active = !$Patient->is_active;
+        
+
+        return true; 
+    }
+   
+    private function isValidDate($date, $format = 'Y-m-d')
+    {
+        $d = \DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) === $date;
     }
 }

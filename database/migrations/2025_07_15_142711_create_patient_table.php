@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->string('province')->nullable();
             $table->string('postal_code')->nullable();
-            $table->string('medical_coerage')->nullable();
+            $table->string('medical_coverage')->nullable();
             $table->timestamps();
         });
     }
