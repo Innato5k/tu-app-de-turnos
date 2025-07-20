@@ -26,10 +26,16 @@ class PatientService
                 'cuil/email' => ['Cuil and email are required.'],
             ]);
         }
+        $data['birth_date'] = substr($data['birth_date'], 0, 10); // "YYYY-MM-DD"
+            if (!$this->isValidDate($data['birth_date'], 'Y-m-d')) {
+                throw ValidationException::withMessages([
+                    'birth_date' => ['Invalid date format for birth_date. Expected format: YYYY-MM-DD'],
+                ]);
+            }
 
         return Patient::create([
             'name' => $data['name'],
-            'last_name' => $data['lastname'],
+            'last_name' => $data['last_name'],
             'cuil' => $data['cuil'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?? null,

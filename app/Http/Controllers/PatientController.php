@@ -56,7 +56,7 @@ class PatientController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'cuil' => 'required|string|max:20|unique:patients,cuil',
             'email' => 'required|email|unique:patients,email',
             'phone' => 'nullable|string|max:20',

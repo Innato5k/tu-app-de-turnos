@@ -1,18 +1,11 @@
-
 document.addEventListener('DOMContentLoaded', async () => {
-    // Obtener el ID del paciente de la URL
-    // Asume que la URL es algo como /patients/{id}/edit
-    const pathSegments = window.location.pathname.split('/');
-    const patientId = pathSegments[pathSegments.length - 2]; 
-
-    // URLs de la API
-    const API_PATIENTS_BASE_URL = '/api/patients'; // Base para GET y PUT
+     // URLs de la API
+    const API_PATIENTS_BASE_URL = '/api/patients'; 
     const REDIRECT_LOGIN_URL = '/login'; // Ruta de login para redireccionar en caso de token inválido
     const REDIRECT_PATIENTS_LIST_URL = '/patients'; // Ruta para volver al listado después de guardar
 
     // Elementos del DOM
-    const editPatientForm = document.getElementById('editPatientForm');
-    const patientIdInput = document.getElementById('patientId');
+    const createPatientForm = document.getElementById('createPatientForm');
     const nameInput = document.getElementById('name');
     const lastNameInput = document.getElementById('last_name');
     const cuilInput = document.getElementById('cuil');
@@ -29,8 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const medicalCoverageInput = document.getElementById('medical_coverage');
     const savePatientButton = document.getElementById('savePatientButton');
     const patientMessage = document.getElementById('patientMessage');
-    const isActiveInput = document.getElementById('is_active');
-    const ageInput = document.getElementById('age');
+    
 
     // Función para obtener el token JWT del localStorage
     function getAuthToken() {
@@ -43,6 +35,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         patientMessage.classList.remove('text-success', 'text-danger', 'text-info');
         patientMessage.classList.add(`text-${type}`);
     }
+  
+
+    // Event listener para formatear el CUIL mientras se escribe
+    cuilInput.addEventListener('input', (e) => {
+        const cursorPosition = e.target.selectionStart; // Guarda la posición del cursor
+        const originalLength = e.target.value.length;
+
+        e.target.value = formatCuil(e.target.value);
+
+        // Ajusta la posición del cursor después del formato
+        const newLength = e.target.value.length;
+        const lengthDifference = newLength - originalLength;
+        e.target.setSelectionRange(cursorPosition + lengthDifference, cursorPosition + lengthDifference);
+    });
 
     // Función para formatear el CUIL (XX-XXXXXXXX-X)
     function formatCuil(value) {
@@ -62,99 +68,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         return formattedValue;
     }
 
-    // Event listener para formatear el CUIL mientras se escribe
-    cuilInput.addEventListener('input', (e) => {
-        const cursorPosition = e.target.selectionStart; // Guarda la posición del cursor
-        const originalLength = e.target.value.length;
-
-        e.target.value = formatCuil(e.target.value);
-
-        // Ajusta la posición del cursor después del formato
-        const newLength = e.target.value.length;
-        const lengthDifference = newLength - originalLength;
-        e.target.setSelectionRange(cursorPosition + lengthDifference, cursorPosition + lengthDifference);
-    });
-
-    // Función para cargar los datos del paciente
-    async function loadPatientData() {
-        const token = getAuthToken();
-        if (!token) {
-            alert('No autenticado. Por favor, inicia sesión.'); // Reemplazar con modal personalizado
-            window.location.href = REDIRECT_LOGIN_URL;
-            return;
-        }
-
-        showMessage('Cargando datos del paciente...', 'info');
-        savePatientButton.disabled = true;
-
-        try {
-            const response = await fetch(`${API_PATIENTS_BASE_URL}/${patientId}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.status === 401 || response.status === 403) {
-                alert('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.'); // Reemplazar con modal personalizado
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('token_type');
-                localStorage.removeItem('user_info');
-                window.location.href = REDIRECT_LOGIN_URL;
-                return;
-            }
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al cargar los datos del paciente.');
-            }
-
-            const patient = await response.json();
-
-            // Llenar el formulario con los datos del paciente
-            patientIdInput.value = patient.id;
-            nameInput.value = patient.name || '';
-            lastNameInput.value = patient.last_name || '';
-            cuilInput.value = patient.cuil ? formatCuil(patient.cuil) : '';
-            emailInput.value = patient.email || '';
-            phoneInput.value = patient.phone || '';
-            phoneOptInput.value = patient.phone_opt || '';
-            observationsInput.value = patient.observations || '';
-            birthDateInput.value = patient.birth_date ? new Date(patient.birth_date).toISOString().split('T')[0] : '';
-            genderInput.value = patient.gender || '';
-            addressInput.value = patient.address || '';
-            cityInput.value = patient.city || '';
-            provinceInput.value = patient.province || '';
-            postalCodeInput.value = patient.postal_code || '';
-            medicalCoverageInput.value = patient.medical_coverage || '';
-            isActiveInput.checked = patient.is_active;   
-            ageInput.value = calculateAge(birthDateInput.value) || '';        
-
-
-            showMessage(''); // Limpiar mensaje de carga
-            savePatientButton.disabled = false;
-
-        } catch (error) {
-            console.error('Error al cargar paciente:', error);
-            showMessage(`Error: ${error.message}`, 'danger');
-            savePatientButton.disabled = true; // Mantener deshabilitado si no se pudieron cargar los datos
-        }
-    }
-
-    function calculateAge(birthDate) {
-        const today = new Date();
-        const birth = new Date(birthDate);
-        let age = today.getFullYear() - birth.getFullYear();
-        const m = today.getMonth() - birth.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-            age--;
-        }
-        return age;
-    }
-
     // Manejador de envío del formulario de edición
-    editPatientForm.addEventListener('submit', async (e) => {
+    createPatientForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const token = getAuthToken();
@@ -186,14 +101,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             province: provinceInput.value,
             postal_code: postalCodeInput.value,
             medical_coverage: medicalCoverageInput.value,
-            is_active: isActiveInput.checked, 
+            
             
             // Si hay otros campos, agrégalos aquí
         };
 
         try {
-            const response = await fetch(`${API_PATIENTS_BASE_URL}/${patientId}`, {
-                method: 'PUT', // Usar PUT para actualización
+            const response = await fetch(`${API_PATIENTS_BASE_URL}`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
@@ -230,13 +145,5 @@ document.addEventListener('DOMContentLoaded', async () => {
             savePatientButton.disabled = false;
             savePatientButton.textContent = 'Guardar Cambios';
         }
-    });
-
-    // Cargar los datos del paciente al iniciar la página
-    if (patientId) {
-        loadPatientData();
-    } else {
-        showMessage('Error: ID de paciente no encontrado en la URL.', 'danger');
-        savePatientButton.disabled = true;
-    }
+    });    
 });
