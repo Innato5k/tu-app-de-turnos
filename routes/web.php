@@ -15,15 +15,24 @@ Route::get('/dashboard', function () {
     return view('/dashboard'); 
 })->name('dashboard');
 
-Route::get('/patients', function () {
-    return view('patients.index');
-})->name('patients.index'); 
+// web.php
 
-Route::get('/patients/create', function () {
-    return view('patients.create');
-})->name('patients.create'); 
+Route::prefix('patients')->group(function () {
 
-Route::get('/patients/{id}/edit/', function ($id) {
-    return view('patients.edit', ['id' => $id]);
-})->name('patients.edit');
+    // GET /patients
+    Route::get('/', function () {
+        return view('patients.index');
+    })->name('patients.index');
+
+    // GET /patients/create
+    Route::get('/create', function () {
+        return view('patients.create');
+    })->name('patients.create');
+
+    // GET /patients/{id}/edit
+    Route::get('/{id}/edit', function ($id) {
+        return view('patients.edit', ['id' => $id]);
+    })->name('patients.edit');
+
+});
 
