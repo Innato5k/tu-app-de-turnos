@@ -48,6 +48,7 @@ class PatientService
             'province' => $data['province'] ?? null,
             'postal_code' => $data['postal_code'] ?? null,
             'medical_coverage' => $data['medical_coverage'] ?? null,
+            'preferred_modality' => $data['preferred_modality'] ?? null,
         ]);
     }           
 
@@ -154,6 +155,9 @@ class PatientService
         }
         if (isset($data['medical_coverage'])) {
             $Patient->medical_coverage = $data['medical_coverage'];
+        }
+        if (isset($data['preferred_modality'])) {
+            $Patient->preferred_modality = $data['preferred_modality'];
         }
         if (isset($data['is_active'])) {
             $Patient->is_active = $data['is_active'];

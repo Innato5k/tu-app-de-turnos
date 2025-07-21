@@ -29,6 +29,7 @@ class Patient extends Model
             'province',
             'postal_code',
             'medical_coerage',
+            'preferred_modality',
             'is_active',
             'is_deleted',
     ];
