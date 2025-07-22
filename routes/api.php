@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\ProfessionalScheduleController;
 
 /*
 
@@ -32,7 +33,7 @@ Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'auth'], function () {
 });
 
 // Rutas protegidas para la gestión de usuarios
-Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'users'], function () {
+Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'usuarios'], function () {
     Route::get('/', [UserController::class, 'index']); 
     Route::get('/{id}', [UserController::class, 'show']); 
     Route::put('/{id}', [UserController::class, 'update']); 
@@ -40,14 +41,22 @@ Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'users'], function () {
 });
 
 // Rutas protegidas para la gestión de Pacientes
-Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'patients'], function () {
+Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'pacientes'], function () {
     Route::get('/', [PatientController::class, 'index']); 
     Route::get('/{id}', [PatientController::class, 'show']); 
     Route::put('/{id}', [PatientController::class, 'update']); 
     Route::delete('/{id}', [PatientController::class, 'destroy']);
-    Route::post('/', [PatientController::class, 'store']); // Para crear un nuevo paciente
+    Route::post('/', [PatientController::class, 'store']);
 });
 
+// Rutas protegidas para la gestión de Pacientes
+Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'misTurnos'], function () {
+    Route::get('/', [ProfessionalScheduleController::class, 'index']); 
+    Route::get('/{id}', [ProfessionalScheduleController::class, 'show']); 
+    Route::put('/{id}', [ProfessionalScheduleController::class, 'update']); 
+    Route::delete('/{id}', [ProfessionalScheduleController::class, 'destroy']);
+    Route::post('/', [ProfessionalScheduleController::class, 'store']);
+});
 // Ejemplo de una ruta protegida adicional
 Route::middleware(['jwt.auth'])->get('/user-profile', function (Request $request) {
     return response()->json(['message' => '¡Bienvenido! Eres un usuario autenticado.', 'user' => $request->user()]);
