@@ -11,7 +11,7 @@ use App\Models\User;
 
 class Appointment extends Model
 {
-    use HasFactory;
+    use HasFactory ,  SoftDeletes;
 
     protected $fillable = [
         'patient_id',
