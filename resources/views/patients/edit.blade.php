@@ -3,7 +3,7 @@
 @section('title', 'Editar Paciente') {{-- Título de la página --}}
 
 @section('content')
-<div class="container py-2 ">
+<div class="container">
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h1 class="fs-3 fw-bold text-dark">Editar Paciente</h1>
 
@@ -18,10 +18,7 @@
             <form id="editPatientForm">
                 @csrf {{-- Token CSRF para protección, aunque en API con JWT no es estrictamente necesario para el endpoint de API, es buena práctica en el formulario Blade --}}
                 @method('PUT') {{-- Método PUT para actualizar recursos --}}
-                <div class=" form-check form-switch form-check-inline">
-                    <label for="is_active" class="form-label text-dark small ">Estado</label>
-                    <input class="form-check-input " type="checkbox" id="is_active">
-                </div>
+
 
                 <div class="row d-flex justify-content-between">
                     <div class="mb-3 col-md-1 ">
@@ -103,27 +100,44 @@
                         <input type="text" id="province" name="province" class="form-control form-control-sm border-secondary">
                     </div>
 
-                    <div class="mb-3 col-md-2
-                        <label for=" postal_code" class="form-label text-dark small">Código Postal</label>
+                    <div class="mb-3 col-md-2">
+                        <label for="postal_code" class="form-label text-dark small">Código Postal</label>
                         <input type="text" id="postal_code" name="postal_code" class="form-control form-control-sm border-secondary">
                     </div>
                 </div>
-
-                <div class="row d-flex justify-content-between">
-                    <div class="mb-3 col-md-8">
+                <div class="row d-flex justify-content-between allign-items-center">
+                    <div class="col mb-3 col-md-9">
                         <label for="observations" class="form-label text-dark small ">Observaciones</label>
                         <textarea id="observations" name="observations" class="form-control form-control-sm border-secondary" rows="3"></textarea>
                     </div>
                     <div class="col mb-3 col-md-3">
-
-
-                        <div class="row d-flex justify-content-end mt-5 mb-1">
-                            <button type="submit" class="btn btn-success text-white fw-semibold py-2 px-4" id="savePatientButton">
-                                Guardar Cambios
-                            </button>
+                        <div class="row  mx-1">
+                            <label for="preferred_modality" class="form-label text-dark small">Modalidad Preferida</label>
+                            <select id="preferred_modality" name="preferred_modality" class="form-select form-select-sm border-secondary">
+                                <option value="" selected disabled>Seleccione una opción</option>
+                                <option value="Presencial">Presencial</option>
+                                <option value="Virtual">Virtual</option>
+                            </select>
                         </div>
                     </div>
                 </div>
+                <div class="row d-flex justify-content-between mb-1">
+                    <div class="col-md-6">
+                        <div class=" mt-2 form-check form-check form-check-inline ">
+                            <label for="is_active" class="form-label text-dark small ">Activo</label>
+                            <input class="form-check-input  border-secondary" type="checkbox" id="is_active">
+                        </div>
+
+                    </div>
+
+                    <div class=" d-flex justify-content-end mb-1 col-md-4">
+                        <button type="submit" class="btn btn-success text-white fw-semibold py-2 px-4" id="savePatientButton">
+                            Guardar Cambios
+                        </button>
+                    </div>
+
+                </div>
+
             </form>
             <div id="patientMessage" class="mt-3 text-center small fw-medium"></div>
         </div>

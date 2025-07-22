@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const provinceInput = document.getElementById('province');
     const postalCodeInput = document.getElementById('postal_code');
     const medicalCoverageInput = document.getElementById('medical_coverage');
+    const preferredModalityInput = document.getElementById('preferred_modality');
     const savePatientButton = document.getElementById('savePatientButton');
     const patientMessage = document.getElementById('patientMessage');
     const isActiveInput = document.getElementById('is_active');
@@ -84,6 +85,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+
         showMessage('Cargando datos del paciente...', 'info');
         savePatientButton.disabled = true;
 
@@ -128,6 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             provinceInput.value = patient.province || '';
             postalCodeInput.value = patient.postal_code || '';
             medicalCoverageInput.value = patient.medical_coverage || '';
+            preferredModalityInput.value = patient.preferred_modality || '';
             isActiveInput.checked = patient.is_active;   
             ageInput.value = calculateAge(birthDateInput.value) || '';        
 
@@ -163,6 +166,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = REDIRECT_LOGIN_URL;
             return;
         }
+        if (!nameInput.value || !lastNameInput.value || !cuilInput.value) {
+            showMessage('Por favor, completa todos los campos obligatorios.', 'danger');
+            return;
+        }
+        const fechNac = new Date(birthDateInput.value).toISOString().split('T')[0]
+        if ( fechNac > new Date().toISOString().split('T')[0]) {
+            showMessage('La fecha de nacimiento no puede ser futura.', 'danger');
+            return;
+        }
 
         savePatientButton.disabled = true;
         savePatientButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
@@ -186,6 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             province: provinceInput.value,
             postal_code: postalCodeInput.value,
             medical_coverage: medicalCoverageInput.value,
+            preferred_modality: preferredModalityInput.value,
             is_active: isActiveInput.checked, 
             
             // Si hay otros campos, agrégalos aquí

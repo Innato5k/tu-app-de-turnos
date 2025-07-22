@@ -69,7 +69,7 @@ class PatientController extends Controller
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'medical_coverage' => 'nullable|string|max:255',
-            'is_active' => 'sometimes|boolean', 
+            'preferred_modality' => 'nullable|string|max:50',
         ]);
 
         return $this->patientService->registerPatient($request->all());
@@ -127,6 +127,7 @@ class PatientController extends Controller
             'province' => 'nullable|string|max:100',
             'postal_code' => 'nullable|string|max:20',
             'medical_coverage' => 'nullable|string|max:255',
+            'preferred_modality' => 'nullable|string|max:50',
             'is_active' => 'sometimes|boolean',
         ]);
         $patient = $this->patientService->updatePatient($id, $request->all());
@@ -138,17 +139,7 @@ class PatientController extends Controller
             'patient' => $patient
         ]);
     }
-
-    public function changeState(string $id)
-    {
-        $state = $this->patientService->changeState($id);
-
-        if ($state) {
-            return response()->json(['message' => 'Patient has been modified successfully'], 200);
-        } else {
-            return response()->json(['message' => 'Patient not found'], 404);
-        }
-    }
+    
     /**
      * Remove the specified resource from storage.
      */
