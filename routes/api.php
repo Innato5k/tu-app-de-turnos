@@ -41,7 +41,7 @@ Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'usuarios'], function ()
 });
 
 // Rutas protegidas para la gestión de Pacientes
-Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'pacientes'], function () {
+Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'patients'], function () {
     Route::get('/', [PatientController::class, 'index']); 
     Route::get('/{id}', [PatientController::class, 'show']); 
     Route::put('/{id}', [PatientController::class, 'update']); 

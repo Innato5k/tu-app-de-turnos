@@ -36,3 +36,22 @@ Route::prefix('patients')->group(function () {
 
 });
 
+Route::prefix('schedules')->group(function () {
+
+    
+    Route::get('/', function () {
+        return view('schedules.index');
+    })->name('schedules.index');
+
+    // GET /patients/create
+    Route::get('/create', function () {
+        return view('schedules.create');
+    })->name('schedules.create');
+
+    // GET /patients/{id}/edit
+    Route::get('/{id}/edit', function ($id) {
+        return view('patients.edit', ['id' => $id]);
+    })->name('patients.edit');
+
+});
+

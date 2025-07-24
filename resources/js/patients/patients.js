@@ -256,6 +256,11 @@ async function deletePatient(patientId) {
 
         // Si la eliminación fue exitosa, oculta el modal y recarga la lista de pacientes
         deleteConfirmationModal.hide();
+        document.body.classList.remove('modal-open');
+        const backdrops = document.getElementsByClassName('modal-backdrop');
+        while(backdrops.length > 0){
+            backdrops[0].parentNode.removeChild(backdrops[0]);
+        }
         alert('Paciente eliminado exitosamente.'); // Considera un modal de éxito
         fetchPatients(); // Recarga la lista para reflejar el cambio
 
@@ -265,6 +270,7 @@ async function deletePatient(patientId) {
     } finally {
         // Oculta el spinner y habilita el botón de confirmación
         deleteSpinner.classList.add('hidden');
+       
         confirmDeleteButton.disabled = false;
         patientToDeleteId = null; // Limpia el ID del paciente a eliminar
     }

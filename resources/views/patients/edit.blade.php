@@ -147,5 +147,5 @@
 
 @section('scripts')
 {{-- Enlaza el archivo JavaScript externo para esta vista --}}
-<script type="module" src="{{ asset('js/patients/edit.js') }}"></script>
+@vite('resources/js/patients/edit.js')
 @endsection
