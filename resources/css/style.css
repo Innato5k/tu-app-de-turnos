@@ -2,7 +2,8 @@
 body {
     font-family: 'Inter', sans-serif;
     /* Fondo con un degradado suave de azul claro a verde menta */
-    background: linear-gradient(to right bottom, #e0f7fa, #e8f5e9); /* Muy ligero azul cian a muy ligero verde */
+    background: linear-gradient(to right bottom, #e0f7fa, #e8f5e9);
+    /* Muy ligero azul cian a muy ligero verde */
 }
 
 /* Ajustes para el spinner de carga del modal */
@@ -14,7 +15,8 @@ body {
 
 /* Ajuste para el color de texto del botón de inicio de sesión */
 .btn-info.text-white {
-    color: #fff !important; /* Asegura que el texto sea blanco sobre el botón info */
+    color: #fff !important;
+    /* Asegura que el texto sea blanco sobre el botón info */
 }
 
 
@@ -27,109 +29,135 @@ body {
 
 
 .fc-v-event .fc-event-main {
-    font-weight: bold !important; /* Asegura que el texto de los eventos sea negrita */
-color: #383333 !important;
+    font-weight: bold !important;
+    /* Asegura que el texto de los eventos sea negrita */
+    color: #383333 !important;
 }
+
 /* Colores de eventos personalizados (usando tus tonos de verde/naranja/rojo) */
 
 /* --- ESTILOS FULLCALENDAR PERSONALIZADOS POR ESTADO --- */
 
 /* 1. DISPONIBLE (VERDE - "GO") */
 .fc .fc-event.fc-event-available {
-    background-color: #d4edda !important; /* Verde claro pastel */
-    border-color: #28a745 !important;    /* Verde más oscuro para el borde */
+    background-color: #d4edda !important; /* Fondo verde claro pastel */
+    border-color: #28a745 !important;    /* Borde verde más oscuro */
     color: #155724 !important;           /* Texto verde oscuro */
 }
 
 /* 2. AGENDADO (AMARILLO/NARANJA - "PRECAUCIÓN") */
-.fc .fc-event.fc-event-booked { /* Usando 'booked' como 'agendado' */
-    background-color: #fff3cd !important; /* Amarillo/naranja pastel */
-    border-color: #ffc107 !important;    /* Naranja más oscuro para el borde */
+.fc .fc-event.fc-event-booked {
+    background-color: #fff3cd !important; /* Fondo amarillo/naranja pastel */
+    border-color: #ffc107 !important;    /* Borde naranja más oscuro */
     color: #856404 !important;           /* Texto amarillo/naranja oscuro */
 }
 
-/* 3. BLOQUEADO (ROJO - "STOP") */
-.fc .fc-event.fc-event-blocked {
-    background-color: #8a8687 !important; /* Rojo claro pastel */
-    border-color: #373535 !important;    /* Rojo más oscuro para el borde */
-    color: #721c24 !important;           /* Texto rojo oscuro */
-    opacity: 0.8;                        /* Ligeramente opaco para indicar inactividad */
-}
-
-
-/* 4. PACIENTE MARCADO COMO PRESENTE (VERDE CLARO DISTINTO / ÉXITO) */
-.fc .fc-event.fc-event-present {
-    background-color: #cce5ff !important; /* Azul claro pastel (Bootstrap info) - para distinción de "Disponible" */
-    border-color: #007bff !important;    /* Azul más oscuro */
-    color: #004085 !important;           /* Texto azul oscuro */
-    /* O un verde diferente si quieres:
-    background-color: #e6ffe6 !important;
-    border-color: #4CAF50 !important;
-    color: #006400 !important;
-    */
-}
-
-/* 5. PACIENTE MARCADO COMO AUSENTE ) */
-.fc .fc-event.fc-event-absent {
-    background-color: #fce4ec !important; /* Rosa claro pastel */
-    border-color: #eb85a7 !important;    /* Rosa más oscuro */
-    color: #880e4f !important;           /* Texto rosa oscuro */
-    opacity: 0.7;                        /* Ligeramente opaco */
-    text-decoration: line-through;       /* Opcional: tachar el texto */
-}
-
-/* 6. PAGADO  */
-.fc .fc-event.fc-event-paid {
-    background-color: #d1ecf1 !important; /* Cian claro pastel (Bootstrap info) - para distinción */
-    border-color: #17a2b8 !important;    /* Cian más oscuro */
-    color: #0c5460 !important;           /* Texto cian oscuro */
-    font-weight: bold;                   /* Opcional: para destacar */
-     border-left: 10px solid #063c1d !important; /* Opcional: borde izquierdo más grueso */
-}
-
-/* 7. DEUDA  */
+/* 3. BLOQUEADO POR PROFESIONAL (ROJO - "STOP") */
 .fc .fc-event.fc-event-debt {
-    background-color: #f5c6cb !important; /* Rojo más intenso pastel */
-    border-color: #dc3545 !important;    /* Rojo más oscuro */
+    background-color: #f8d7da !important; /* Fondo rojo claro pastel */
+    border-color: #dc3545 !important;    /* Borde rojo más oscuro */
     color: #721c24 !important;           /* Texto rojo oscuro */
-    font-weight: bold;                   /* Opcional: para destacar */
-    border-left: 10px solid #dc3545 !important; /* Opcional: borde izquierdo más grueso */
+    opacity: 0.8;                        /* Ligeramente transparente para indicar inactividad */
+    font-style: italic;                  /* Opcional: cursiva para este estado */
+    border-left: 5px solid #ff0000 !important; /* Barra lateral para mayor énfasis */
+}
+
+
+/* --- ESTADOS DE PACIENTE Y PAGO --- */
+
+/* 4. AUSENTE (GRIS OSCURO / NEUTRAL-NEGATIVO) */
+.fc .fc-event.fc-event-blocked {
+    background-color: #e9ecef !important; /* Fondo gris muy claro (Bootstrap light) */
+    border-color: #adb5bd !important;    /* Borde gris medio */
+    color: #495057 !important;           /* Texto gris oscuro */
+    opacity: 0.7;                        /* Ligeramente transparente */
+    text-decoration: line-through;       /* ¡Importante! Tachar para indicar ausencia/no realización */
+}
+
+/* 5. PRESENTE PAGADO (AZUL CLARO - ÉXITO/CONFIRMACIÓN Y PAGO) */
+.fc .fc-event.fc-event-paid {
+    background-color: #d1ecf1 !important; /* Fondo cian/azul claro pastel (Bootstrap info alterado) */
+    border-color: #17a2b8 !important;    /* Borde cian más oscuro */
+    color: #0c5460 !important;           /* Texto cian oscuro */
+    font-weight: bold;                   /* Destacar que está pagado */
+}
+
+/* 6. PRESENTE DEUDA (PÚRPURA CLARO - ADVERTENCIA/FINANCIERO PENDIENTE) */
+.fc .fc-event.fc-event-absent {
+    background-color: #e0cffc !important; /* Fondo lila/púrpura claro pastel */
+    border-color: #6f42c1 !important;    /* Borde púrpura más oscuro */
+    color: #3e266a !important;           /* Texto púrpura oscuro */
+    font-weight: bold;                   /* Destacar la deuda */
+} 
+
+/* 7. CANCELADO (GRIS INACTIVO - CANCELACIÓN) */
+.fc .fc-event.fc-event-canceled {
+    background-color: #ced4da !important; /* Fondo gris medio */
+    border-color: #6c757d !important;    /* Borde gris oscuro */
+    color: #343a40 !important;           /* Texto gris muy oscuro */
+    opacity: 0.6;                        /* Más transparente para indicar inactividad/finalización */
+    text-decoration: line-through;       /* ¡Importante! Tachar el texto y visualizar la cancelación */
+}
+
+/* 8. NO TOMADO (GRIS MUY CLARO - NO TOMADO)*/
+.fc .fc-event.fc-event-notTaken {
+    background-color: #f7f7f7 !important; /* Almost white grey background */
+    border-color: #e0e0e0 !important;    /* Very light grey border */
+    color: #a0a0a0 !important;           /* Light grey text */
+    opacity: 0.8;                        /* Slightly transparent */
+    font-style: italic;                  /* Optional: italicize to differentiate visually */
+}
+/* 9. EXTRA (AZUL OSCURO VIBRANTE - EMERGENCIA/EXCEPCIÓN) - ¡NUEVO COLOR! */
+.fc .fc-event.fc-event-extra {
+    background-color: #f3d680 !important; /* Fondo amarillo claro */
+    border-color: #ff0000 !important;    /* Borde rojo puro */
+    color: #ffffff !important;           /* Texto blanco para alto contraste */
+    font-weight: bold;                   /* Destacar */
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.4); /* Sombra más pronunciada */
+    border-left: 5px solid #ffeb3b !important; /* Barra lateral amarilla brillante para máxima atención */
 }
 
 
 /* Estilo para los botones de navegación de FullCalendar */
 .fc .fc-button-primary {
-    background-color: var(--bs-primary) !important; /* Usa el color primary de Bootstrap */
+    background-color: var(--bs-primary) !important;
+    /* Usa el color primary de Bootstrap */
     border-color: var(--bs-primary) !important;
     color: #fff !important;
 }
 
 .fc .fc-button-primary:hover {
-    background-color: var(--bs-primary-hover) !important; /* Puedes definir esto en tus variables de Bootstrap si tienes */
+    background-color: var(--bs-primary-hover) !important;
+    /* Puedes definir esto en tus variables de Bootstrap si tienes */
     border-color: var(--bs-primary-hover) !important;
 }
 
 /* Asegura que el color de los enlaces dentro de FullCalendar sea consistente */
 .fc a {
-    color: var(--bs-info); /* Usa tu color info para enlaces si lo prefieres */
+    color: var(--bs-info);
+    /* Usa tu color info para enlaces si lo prefieres */
     text-decoration: none;
 }
 
 /* Personalizar las cabeceras de los días */
 .fc .fc-col-header-cell-cushion {
-    font-weight: 600; /* Semibold para los días de la semana */
-    color: #343a40; /* Un gris oscuro */
+    font-weight: 600;
+    /* Semibold para los días de la semana */
+    color: #343a40;
+    /* Un gris oscuro */
 }
 
 /* Personalizar las franjas horarias */
 .fc .fc-timegrid-slot-label-cushion {
     font-weight: 500;
-    color: #6c757d; /* Gris para las horas */
+    color: #6c757d;
+    /* Gris para las horas */
 }
 
 /* Sombra y bordes para el calendario principal */
 .fc {
-    border-radius: 0.5rem; /* Bordes redondeados para el calendario */
-    overflow: hidden; /* Asegura que los bordes redondeados se apliquen bien */
+    border-radius: 0.5rem;
+    /* Bordes redondeados para el calendario */
+    overflow: hidden;
+    /* Asegura que los bordes redondeados se apliquen bien */
 }
-

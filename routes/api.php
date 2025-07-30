@@ -49,10 +49,11 @@ Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'patients'], function ()
     Route::post('/', [PatientController::class, 'store']);
 });
 
-// Rutas protegidas para la gestión de Pacientes
-Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'misTurnos'], function () {
+// Rutas protegidas para la gestión de Profesional Schedules
+Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'professionalSchedule'], function () {
     Route::get('/', [ProfessionalScheduleController::class, 'index']); 
     Route::get('/{id}', [ProfessionalScheduleController::class, 'show']); 
+    Route::get('/user/{id}', [ProfessionalScheduleController::class, 'showByUserId']); 
     Route::put('/{id}', [ProfessionalScheduleController::class, 'update']); 
     Route::delete('/{id}', [ProfessionalScheduleController::class, 'destroy']);
     Route::post('/', [ProfessionalScheduleController::class, 'store']);

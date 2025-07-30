@@ -15,7 +15,7 @@ class ProfessionalScheduleService
      *
      * @return \Illuminate\Database\Eloquent\Collection<ProfessionalSchedule>
      */
-    public function getAllSchedules(Request $request, string $orderBy = 'start_time'): Collection
+    public function getAllSchedules(Request $request, string $orderBy = 'effective_start_date'): Collection
     {
 
         // Aquí podrías agregar lógica para filtrar o paginar los horarios si es necesario
@@ -27,6 +27,11 @@ class ProfessionalScheduleService
         return ProfessionalSchedule::find($id);
     }
 
+    public function findScheduleByUserId(int $id, string $orderBy = 'effective_start_date'): ?Collection
+    {
+        return ProfessionalSchedule::where('user_id', $id)->orderBy($orderBy)->get();
+    }
+
     public function updateSchedule(int $id, Request $request): ?ProfessionalSchedule
     {
         $schedule = $this->findScheduleById($id);
@@ -35,7 +40,7 @@ class ProfessionalScheduleService
             return null;
         }
 
-        if($request->input('start_time') >= $request->input('end_time')) {
+        if ($request->input('start_time') >= $request->input('end_time')) {
             throw ValidationException::withMessages([
                 'start_time' => ['The start time must be before the end date-time.'],
             ]);
@@ -70,7 +75,8 @@ class ProfessionalScheduleService
             ->where('start_time', $data['start_time'])
             ->where('end_time', $data['end_time'])
             ->where('id', '!=', $id)
-            ->exists()) {
+            ->exists()
+        ) {
             throw ValidationException::withMessages([
                 'schedule' => ['The schedule overlaps with an existing one.'],
             ]);
@@ -83,7 +89,7 @@ class ProfessionalScheduleService
     public function store(Request $request): ProfessionalSchedule
     {
 
-        if($request->input('start_time') >= $request->input('end_time') ) {
+        if ($request->input('start_time') >= $request->input('end_time')) {
             throw ValidationException::withMessages([
                 'start_time' => ['The start time must be before the end time.'],
             ]);
@@ -132,8 +138,8 @@ class ProfessionalScheduleService
 
         // Consulta para obtener horarios existentes para el mismo profesional y día de la semana
         $query = ProfessionalSchedule::where('user_id', $userId)
-                                     ->where('day_of_week', $dayOfWeek)
-                                     ->where('deleted_at', null); // Excluir horarios eliminados
+            ->where('day_of_week', $dayOfWeek)
+            ->where('deleted_at', null); // Excluir horarios eliminados
 
         // Si estamos actualizando un horario, excluimos el propio horario de la verificación
         if ($excludeScheduleId) {
@@ -167,5 +173,4 @@ class ProfessionalScheduleService
 
         return false; // No se encontraron superposiciones
     }
-
 }

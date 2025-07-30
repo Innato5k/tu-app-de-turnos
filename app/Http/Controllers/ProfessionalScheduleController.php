@@ -63,6 +63,17 @@ class ProfessionalScheduleController extends Controller
         return response()->json($schedule);
     }
 
+    public function showByUserId(int $id)
+    {
+        $schedule = $this->professionalScheduleService->findScheduleByUserId($id);
+
+        if (!$schedule) {
+            return response()->json(['message' => 'User Schedule not found'], 404);
+        }
+
+        return response()->json($schedule);
+    }
+
     public function update(Request $request, int $id)
     {
         $request->validate([
