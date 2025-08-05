@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutButton = document.getElementById('logoutButton');
     const loginLink = document.getElementById('loginLink');
     const linkInicio = document.getElementById('linkInicio');
+    const linkHoraiosProfesional = document.getElementById('linkHoraiosProfesional');
     const linkMisTurnos = document.getElementById('linkMisTurnos');
     const linkPacientes = document.getElementById('linkPacientes');
     const linkContactos = document.getElementById('linkContactos');
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutButton.classList.remove('d-none'); // Muestra el botón de logout
             loginLink.classList.add('d-none'); // Oculta el enlace de login
             linkInicio.classList.remove('d-none'); // Oculta el menú de navegación no autenticado
+            linkHoraiosProfesional.classList.remove('d-none');
             linkMisTurnos.classList.remove('d-none');
             linkPacientes.classList.remove('d-none');
             linkContactos.classList.remove('d-none');
@@ -31,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutButton.classList.add('d-none');
             loginLink.classList.remove('d-none');
             linkInicio.classList.add('d-none');
+            linkHoraiosProfesional.classList.add('d-none');
             linkMisTurnos.classList.add('d-none');
             linkPacientes.classList.add('d-none');
             linkContactos.classList.add('d-none');
@@ -41,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutButton.classList.add('d-none');
         loginLink.classList.remove('d-none');
         linkInicio.classList.add('d-none');
+        linkHoraiosProfesional.classList.add('d-none');
         linkMisTurnos.classList.add('d-none');
         linkPacientes.classList.add('d-none');
         linkContactos.classList.add('d-none');

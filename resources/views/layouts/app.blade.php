@@ -39,10 +39,10 @@
                             <a id="linkInicio" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/dashboard">Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a id="linkMisTurnos" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/schedules">Mis Horarios</a>
+                            <a id="linkMisTurnos" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/schedules">Calendario de Turnos</a>
                         </li>
                         <li class="nav-item">
-                            <a id="linkMisTurnos" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="#">Mis Turnos</a>
+                            <a id="linkHoraiosProfesional" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/professionalSchedules">Horarios de Atención</a>
                         </li>
                         <li class="nav-item">
                             <a id="linkPacientes" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/patients">Mis Pacientes</a>

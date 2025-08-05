@@ -52,10 +52,12 @@ function redirectToLogin(message) {
  * Carga los pacientes desde la API y actualiza la tabla y la paginación.
  * @param {number} page Número de página a cargar.
  */
-async function fetchPatients(page = 1, searchQuery = '') { // MODIFICADO: Añadido searchQuery como parámetro
+async function fetchPatients(page = 1, searchQuery = '') { 
     const token = getAuthToken();
+   
 
     if (!token) {
+        
         redirectToLogin('No autenticado. Por favor, inicia sesión.');
         return;
     }
@@ -89,6 +91,7 @@ async function fetchPatients(page = 1, searchQuery = '') { // MODIFICADO: Añadi
         });
 
         if (response.status === 401 || response.status === 403) {
+            
             redirectToLogin('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
             return;
         }

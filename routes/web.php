@@ -15,6 +15,7 @@ Route::get('/dashboard', function () {
     return view('/dashboard'); 
 })->name('dashboard');
 
+
 // web.php
 
 Route::prefix('patients')->group(function () {
@@ -52,6 +53,25 @@ Route::prefix('schedules')->group(function () {
     Route::get('/{id}/edit', function ($id) {
         return view('patients.edit', ['id' => $id]);
     })->name('patients.edit');
+
+});
+
+Route::prefix('professionalSchedules')->group(function () {
+
+    
+    Route::get('/', function () {
+        return view('professionalSchedules.index');
+    })->name('professionalSchedules.index');
+
+    // GET /patients/create
+    Route::get('/create', function () {
+        return view('professionalSchedules.create');
+    })->name('professionalSchedules.create');
+
+    // GET /patients/{id}/edit
+    Route::get('/{id}/edit', function ($id) {
+        return view('professionalSchedules.edit', ['id' => $id]);
+    })->name('professionalSchedules.edit');
 
 });
 

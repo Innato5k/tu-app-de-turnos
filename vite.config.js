@@ -12,6 +12,7 @@ export default defineConfig({
                 'resources/js/patients/patients.js',
                 'resources/js/patients/patients/edit.js',
                 'resources/js/patients/patients/create.js',
+                'resources/js/professionalSchedule/professionalSchedule.js',
                 
             ],
             refresh: true,

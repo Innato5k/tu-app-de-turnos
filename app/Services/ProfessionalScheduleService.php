@@ -6,7 +6,9 @@ use App\Models\ProfessionalSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
+use Hamcrest\Arrays\IsArray;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 
 class ProfessionalScheduleService
 {
@@ -15,11 +17,10 @@ class ProfessionalScheduleService
      *
      * @return \Illuminate\Database\Eloquent\Collection<ProfessionalSchedule>
      */
-    public function getAllSchedules(Request $request, string $orderBy = 'effective_start_date'): Collection
+    public function getAllSchedules(Request $request, string $orderBy = 'day_of_week'): Collection
     {
-
-        // Aquí podrías agregar lógica para filtrar o paginar los horarios si es necesario
-        return ProfessionalSchedule::orderBy($orderBy)->get();
+        $userID = auth()->user()->id;
+        return ProfessionalSchedule::where('user_id', $userID)->orderBy($orderBy)->get();
     }
 
     public function findScheduleById(int $id): ?ProfessionalSchedule
@@ -27,7 +28,7 @@ class ProfessionalScheduleService
         return ProfessionalSchedule::find($id);
     }
 
-    public function findScheduleByUserId(int $id, string $orderBy = 'effective_start_date'): ?Collection
+    public function findScheduleByUserId(int $id, string $orderBy = 'day_of_week'): ?Collection
     {
         return ProfessionalSchedule::where('user_id', $id)->orderBy($orderBy)->get();
     }
@@ -86,36 +87,40 @@ class ProfessionalScheduleService
         return $schedule;
     }
 
-    public function store(Request $request): ProfessionalSchedule
+    public function store(Request $request)
     {
+        if (!auth()->check()) {
+            dd('Usuario no autenticado para esta API. Token ausente/inválido.');
+        }
+        $userID = auth()->user()->id;
+        $daysOfWeek = $request->input('days_of_week');
+       
 
-        if ($request->input('start_time') >= $request->input('end_time')) {
-            throw ValidationException::withMessages([
-                'start_time' => ['The start time must be before the end time.'],
+        foreach ($daysOfWeek as $dayNumber) {
+
+
+            if ($this->hasOverlap(
+                $userID,
+                (string)$dayNumber,
+                $request->input('start_time'),
+                $request->input('end_time'),
+                $request->input('start_date'),
+                $request->input('end_date')
+            )) {
+                throw ValidationException::withMessages([
+                    'schedule' => ['The schedule overlaps with an existing one.'],
+                ]);
+            }
+
+            ProfessionalSchedule::create([
+                'user_id' => $userID,
+                'start_time' => $request->input('start_time'),
+                'end_time' => $request->input('end_time'),
+                'day_of_week' => (string)$dayNumber,
+                'effective_start_date' => $request->input('start_date') ?? null,
+                'effective_end_date' => $request->input('end_date') ?? null,
             ]);
         }
-
-        if ($this->hasOverlap(
-            $request->input('user_id'),
-            $request->input('day_of_week'),
-            $request->input('start_time'),
-            $request->input('end_time'),
-            $request->input('effective_start_date'),
-            $request->input('effective_end_date')
-        )) {
-            throw ValidationException::withMessages([
-                'schedule' => ['The schedule overlaps with an existing one.'],
-            ]);
-        }
-
-        return ProfessionalSchedule::create([
-            'user_id' => $request->input('user_id'),
-            'start_time' => $request->input('start_time'),
-            'end_time' => $request->input('end_time'),
-            'day_of_week' => $request->input('day_of_week'),
-            'effective_start_date' => $request->input('effective_start_date') ?? null,
-            'effective_end_date' => $request->input('effective_end_date') ?? null,
-        ]);
     }
 
     public function hasOverlap(

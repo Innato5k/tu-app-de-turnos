@@ -1,0 +1,43 @@
+.card {
+    margin-top: 20px;
+}
+
+.time-input-group {
+    display: flex;
+    align-items: center;
+}
+
+.time-input-group label {
+    margin-right: 10px;
+    min-width: 60px;
+    /* Asegura que las etiquetas estén alineadas */
+}
+
+.time-input-group input[type="time"] {
+    flex-grow: 1;
+}
+
+.form-check {
+    margin-top: 15px;
+}
+
+.date-range-fields {
+    margin-top: 15px;
+    padding: 15px;
+    border: 1px dashed #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.hidden {
+    display: none;
+}
+
+.day-checkboxes label {
+    margin-right: 15px;
+}
+
+.table th,
+.table td {
+    vertical-align: middle;
+}

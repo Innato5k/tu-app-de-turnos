@@ -5,7 +5,7 @@
 @section('content')
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fs-3 fw-bold text-dark">Mis Horarios Agendados</h1>
+        <h1 class="fs-3 fw-bold text-dark">Calendario de turnos</h1>
         
         <a href="{{ route('schedules.create') }}" class="btn btn-primary fw-semibold d-flex align-items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-calendar-plus me-2" viewBox="0 0 16 16">
