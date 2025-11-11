@@ -6,6 +6,8 @@ use App\Http\Controllers\Auth\LoginController;
 
 // Ruta para mostrar el formulario de login
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+// Ruta para mostrar el formulario de login
+Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
 
 // Ruta para procesar el envío del formulario de login
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');

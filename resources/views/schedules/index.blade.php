@@ -16,8 +16,53 @@
         </a>
     </div>
 
-    <div class="card shadow-sm mb-4 p-3"> {{-- Añadí p-3 para padding interno --}}
-        <div id='Calendar'></div> {{-- Este es el div donde FullCalendar se renderizará --}}
+    <div id="contenedorCalendar"class="card shadow-sm mb-4 p-1"> 
+        <div id='Calendar' class="p-3"></div> 
+    </div>
+</div>
+
+<!-- Modal para confirmar reserva -->
+
+<div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">Confirmar Reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reservationForm">
+                    <input type="hidden" id="slotIdInput" name="available_slot_id">
+                    
+                    <p>Usted está a punto de reservar este turno. Por favor, complete los detalles:</p>
+                    
+                    <div class="mb-3">
+                        <label for="modality" class="form-label">Modalidad</label>
+                        <select class="form-select" id="modality" name="modality" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="presencial">Presencial</option>
+                            <option value="virtual">Virtual</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="cost" class="form-label">Costo ($)</label>
+                        <input type="number" class="form-control" id="cost" name="cost" required value="5000" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notas (Opcional)</label>
+                        <textarea class="form-control" id="notes" name="notes" rows="2"></textarea>
+                    </div>
+
+                    <div id="reservationFeedback" class="mt-3"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="confirmReservationBtn">Confirmar Reserva</button>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

@@ -4,7 +4,7 @@
 
 const API_PROFESSIONALSCHEDULES_URL = '/api/professionalSchedule'; // URL base de tu API para horarios de profesionales
 const REDIRECT_LOGIN_URL = '/login'; // Ruta a la página de inicio de sesión (web)
-const EDIT_PATIENT_BASE_URL = '/patients'; // Base para la URL de edición (ej. /patients/1/edit)
+//const EDIT_PATIENT_BASE_URL = '/patients'; // Base para la URL de edición (ej. /patients/1/edit)
 // Mapeo de valores de día (0-6) a nombres
 const dayNames = {
     0: 'Domingo',
@@ -73,7 +73,7 @@ async function fetchAndDisplaySchedules() {
         }
         const schedules = await response.json();
 
-        schedulesTableBody.innerHTML = ''; // Limpiar el mensaje de carga
+        schedulesTableBody.innerHTML = '';
 
         if (schedules.length === 0) {
             schedulesTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay horarios cargados.</td></tr>';
@@ -81,7 +81,7 @@ async function fetchAndDisplaySchedules() {
         }
 
         schedules.forEach(schedule => {
-            const row = schedulesTableBody.insertRow(); 
+            const row = schedulesTableBody.insertRow();
             const daysText = dayNames[schedule.day_of_week] || 'Desconocido';
             const startDateTime = schedule.start_time;
             const endDateTime = schedule.end_time;
@@ -95,7 +95,17 @@ async function fetchAndDisplaySchedules() {
                     <td>${effectiveStartDate}</td>
                     <td>${effectiveEndDate}</td>
                     <td>
-                        <button class="btn btn-danger btn-sm delete-schedule" data-id="${schedule.id}">Eliminar</button>
+                        <button class="btn btn-info btn-sm delete-schedule text-white" data-id="${schedule.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
+                            </svg>
+                        </button>
+                        <button class="btn btn-danger btn-sm delete-schedule" data-id="${schedule.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                            </svg>
+                        </button>
                     </td>
                 `;
         });
@@ -114,7 +124,7 @@ enableDateRangeCheckbox.addEventListener('change', function () {
         document.getElementById('startDate').setAttribute('required', 'required');
         document.getElementById('endDate').setAttribute('required', 'required');
     } else {
-       dateRangeFields.hidden = true;
+        dateRangeFields.hidden = true;
         // Removemos el atributo required si están deshabilitados
         document.getElementById('startDate').removeAttribute('required');
         document.getElementById('endDate').removeAttribute('required');
@@ -130,10 +140,10 @@ enableDateRangeCheckbox.addEventListener('change', function () {
 scheduleForm.addEventListener('submit', async function (event) {
     event.preventDefault(); // Evitar el envío por defecto del formulario
     const token = getAuthToken();
-        if (!token) {
-            redirectToLogin('No autenticado. Por favor, inicia sesión.');
-            return; 
-        }
+    if (!token) {
+        redirectToLogin('No autenticado. Por favor, inicia sesión.');
+        return;
+    }
 
     const selectedDays = Array.from(document.querySelectorAll('input[type="checkbox"]:checked:not(#enableDateRange)'))
         .map(checkbox => parseInt(checkbox.value));
@@ -171,18 +181,18 @@ scheduleForm.addEventListener('submit', async function (event) {
         start_time: startTime,
         end_time: endTime,
         start_date: enableDateRangeCheckbox.checked ? startDate : null,
-        end_date: enableDateRangeCheckbox.checked ? endDate : null,        
+        end_date: enableDateRangeCheckbox.checked ? endDate : null,
     };
-   
+
 
     try {
-        const response = await fetch(`${API_PROFESSIONALSCHEDULES_URL}`, { 
+        const response = await fetch(`${API_PROFESSIONALSCHEDULES_URL}`, {
             method: 'POST',
             headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
             body: JSON.stringify(scheduleData)
         });
 
@@ -242,7 +252,6 @@ function attachDeleteListeners() {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-
     // Cargar los horarios al cargar la página por primera vez
     fetchAndDisplaySchedules();
 });

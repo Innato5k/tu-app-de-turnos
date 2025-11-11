@@ -4,15 +4,21 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Console\Commands\GenerateAvailableSlots;
 
 class Kernel extends ConsoleKernel
 {
+    protected $commands = [
+        GenerateAvailableSlots::class, 
+    ];
+
     /**
      * Define the application's command schedule.
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        //Generar los slots de turnos disponibles diariamente
+        $schedule->command('slots:generate')->daily();
     }
 
     /**

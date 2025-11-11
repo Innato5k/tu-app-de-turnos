@@ -6,9 +6,7 @@ use App\Models\ProfessionalSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
-use Hamcrest\Arrays\IsArray;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Log;
 
 class ProfessionalScheduleService
 {

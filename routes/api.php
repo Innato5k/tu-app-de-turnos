@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProfessionalScheduleController;
+use App\Http\Controllers\ProfessionalAppointmentsController;
 
 /*
 
@@ -57,6 +58,15 @@ Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'professionalSchedule'],
     Route::put('/{id}', [ProfessionalScheduleController::class, 'update']); 
     Route::delete('/{id}', [ProfessionalScheduleController::class, 'destroy']);
     Route::post('/', [ProfessionalScheduleController::class, 'store']);
+});
+// Rutas protegidas para la gestión de Available Slots y appointments
+Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'professionalAppointments'], function () {
+    Route::get('/', [ProfessionalAppointmentsController::class, 'index']); 
+    Route::get('/{id}', [ProfessionalAppointmentsController::class, 'show']); 
+    Route::get('/user/{id}', [ProfessionalAppointmentsController::class, 'showByUserId']); 
+    Route::put('/{id}', [ProfessionalAppointmentsController::class, 'update']); 
+    Route::delete('/{id}', [ProfessionalAppointmentsController::class, 'destroy']);
+    Route::post('/book', [ProfessionalAppointmentsController::class, 'book']);
 });
 // Ejemplo de una ruta protegida adicional
 Route::middleware(['jwt.auth'])->get('/user-profile', function (Request $request) {

@@ -8,7 +8,7 @@
 <div class="container mt-5">
     <h1 class="mb-4 text-center">Gestión de Horarios Laborales</h1>
 
-    <div class="card">
+    <div class="card mb-4">
         <div class="card-header bg-info text-white">
             <h4>Horarios Laborales Cargados</h4>
         </div>
@@ -35,9 +35,13 @@
         </div>
     </div>
 
+    
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
             <h4>Agregar Nuevo Horario</h4>
+        </div>
+        <div>
+
         </div>
         <div class="card-body">
             <form id="scheduleForm">
@@ -115,11 +119,11 @@
         </div>
     </div>
 
-    
+
 </div>
 
 @endsection
 
 @section('scripts')
-@vite('resources/js/professionalSchedule/professionalSchedule.js') 
+@vite('resources/js/professionalSchedule/professionalSchedule.js')
 @endsection
