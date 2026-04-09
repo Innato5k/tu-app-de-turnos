@@ -1,3 +1,5 @@
+import TomSelect from 'tom-select';
+import 'tom-select/dist/css/tom-select.bootstrap5.css'
 // Importaciones correctas de FullCalendar y sus plugins desde node_modules
 import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -5,7 +7,11 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import esLocale from '@fullcalendar/core/locales/es'; // Importa el locale de español
+
+
+const patientsApiUrl = '/api/patients/listActivePatients';
 var calendar
+var tomSelectInstance = null;
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -38,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
         eventClassNames: 'fc-event-custom', // Clase CSS personalizada para eventos
         timeZone: 'America/Argentina/Buenos_Aires',
 
-        eventClick: function(info) {
+        eventClick: function (info) {
             // El objeto 'info' contiene toda la información del evento clickeado
             handleSlotClick(info.event);
         },
@@ -152,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 info.el.classList.add('fc-event-debt');
             } else if (info.event.extendedProps.status === 'cancelled') { // cancelled
                 info.el.classList.add('fc-event-cancelled');
-            }else if (info.event.extendedProps.status === 'extra') { // not taken
+            } else if (info.event.extendedProps.status === 'extra') { // not taken
                 info.el.classList.add('fc-event-extra');
             }
         },
@@ -164,53 +170,137 @@ document.addEventListener('DOMContentLoaded', function () {
         }*/
     });
 
+
+
+
+
+    const confirmBtn = document.getElementById('confirmReservationBtn');
+    confirmBtn.addEventListener('click', function () {
+        submitReservation();
+    });
     calendar.render();
 });
 
+//Función para recolectar y enviar los datos
+function submitReservation() {
+    const form = document.getElementById('reservationForm');
+    const slotId = document.getElementById('slotIdInput').value;
+    const modality = document.getElementById('modality').value;
+    const cost = document.getElementById('cost').value;
+    const notes = document.getElementById('notes').value;
+
+    // Validación rápida
+    if (!modality) {
+        alert('Por favor, selecciona una modalidad.');
+        return;
+    }
+
+    const payload = {
+        available_slot_id: slotId,
+        modality: modality,
+        cost: cost,
+        notes: notes,
+        // **Falta el client_id, que debe obtenerse del usuario autenticado**
+        // Si usas Sanctum, tu backend lo obtendrá de auth()->user()->id;
+        // Si no, necesitarías incluirlo aquí.
+    };
+
+    // Llamar a la API
+    sendReservationRequest(payload);
+}
+
 // Función que manejará la lógica del clic
 function handleSlotClick(event) {
-    const status = event.extendedProps.status; 
-    const slotId = event.id; 
+    const status = event.extendedProps.status;
+    const slotId = event.id;
     const startTimeStr = event.startStr;
 
     const formattedTime = startTimeStr ? startTimeStr.slice(11, 16) : 'Hora desconocida';
 
-    if (status === 'available') {        
-        console.log(`Slot disponible clicado. ID: ${slotId}, Hora: ${formattedTime}`);   
-        showReservationModal(slotId, formattedTime);        
+    if (status === 'available') {
+        console.log(`Slot disponible clicado. ID: ${slotId}, Hora: ${formattedTime}`);
+        showReservationModal(slotId, formattedTime);
     } else {
         alert(`Este horario (${formattedTime}) está ${status} y no puede ser reservado.`);
     }
 }
 
+//Modal de reserva
 function showReservationModal(slotId, formattedTime) {
-    // Asume que tienes un modal con el ID 'reservationModal' en tu HTML
     const modalElement = document.getElementById('reservationModal');
-    
-    // 1. Mostrar la hora en el título o cuerpo del modal
     document.getElementById('modalTitle').textContent = `Reservar turno a las ${formattedTime}`;
-    
-    // 2. Almacenar el slotId en un campo oculto o en un atributo del botón de guardar
-    // Esto es CLAVE para enviarlo en la petición POST
     document.getElementById('slotIdInput').value = slotId;
 
-    // 3. Abrir el modal (ejemplo con Bootstrap)
+    if (tomSelectInstance) {
+        tomSelectInstance.destroy();
+        tomSelectInstance = null;
+    }
     const reservationModal = new bootstrap.Modal(modalElement);
+    reservationModal.show();
+    const patientSelectEl = document.getElementById('patientSelect');
+
+    if (patientSelectEl) {
+        new TomSelect(patientSelectEl, {
+            labelField: 'text',
+            searchField: ['text'],
+            placeholder: 'Buscar paciente por nombre, apellido o DNI.',
+
+            dropdownParent: 'reservationModal', // o el ID de tu modal
+
+            // Función para cargar los datos vía AJAX
+            load: function (query, callback) {
+                if (!query.length) return callback();
+
+                fetch(patientsApiUrl + '?search=' + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        // El callback recibe el array de resultados
+                        // Tu backend debe devolver un array de objetos con {id, text, modality, cost}
+                        callback(data);
+                    }).catch(() => {
+                        // Manejo de errores
+                        callback();
+                    });
+            },
+
+            /*
+
+            // LÓGICA CLAVE: Cargar datos automáticos al seleccionar un paciente
+            onItemAdd: function (value, item) {
+                // 'this.options' contiene todos los objetos cargados, indexados por 'id'
+                const selectedData = this.options[value];
+
+                if (selectedData) {
+                    // Actualizar los campos del modal
+                    document.getElementById('modality').value = selectedData.modality;
+                    document.getElementById('cost').value = selectedData.cost;
+                }
+            },*/
+
+            // Lógica para limpiar si el usuario borra la selección
+            onClear: function () {
+                document.getElementById('modality').value = 'presencial'; // Valor por defecto
+                document.getElementById('cost').value = 5000; // Valor por defecto
+            }
+        });
+    }
+
     reservationModal.show();
 }
 
+// Función para obtener datos del calendario desde el backend
 function fetchCalendarData(startDate, endDate) {
     const apiUrl = `/api/professionalAppointments/?start_date=${startDate}&end_date=${endDate}`;
     const token = localStorage.getItem('auth_token');
     if (!token) {
-    console.error("Token de autenticación no encontrado.");
-  }
+        console.error("Token de autenticación no encontrado.");
+    }
 
     fetch(apiUrl, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token 
+            'Authorization': 'Bearer ' + token
         }
     })
         .then(response => {
@@ -220,7 +310,7 @@ function fetchCalendarData(startDate, endDate) {
             return response.json();
         })
         .then(data => {
-            const rawEvents =  data.original;
+            const rawEvents = data.original;
             console.log('Datos recibidos del backend:', rawEvents);
 
             // Aquí debes procesar los datos para FullCalendar

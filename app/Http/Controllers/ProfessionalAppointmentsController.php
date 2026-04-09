@@ -18,6 +18,7 @@ class ProfessionalAppointmentsController extends Controller
 
     public function book(Request $request)
     {
+        //TODO: revisar si esto realmente esta funcionando. 
         $request->validate([
             'available_slot_id' => 'required|exists:available_slots,id',
             'notes' => 'nullable|string|max:500',

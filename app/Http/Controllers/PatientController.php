@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Patient\StorePatientRequest;
+use App\Http\Requests\Patient\UpdatePatientRequest;
+use App\DTOs\Patient\PatientRequestDTO;
+use App\DTOs\Patient\PatientUpdateRequestDTO;
 use Illuminate\Http\Request;
 use App\Services\PatientService;
-use App\Models\Patient; 
-use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PatientController extends Controller
 {
@@ -18,68 +21,46 @@ class PatientController extends Controller
     public function __construct(PatientService $patientService)
     {
         $this->patientService = $patientService;
-        $this->middleware('jwt.auth'); // Asegura que las rutas estén protegidas
+        $this->middleware('jwt.auth');
     }
 
     public function index(Request $request)
     {
-        // Obtiene el término de búsqueda de la URL (parámetro 'search')
+        //TODO: pasar los parámetros de búsqueda, ordenamiento y paginación a la capa de servicio
         $searchQuery = $request->query('search');
-        // Obtiene el número de elementos por página (parámetro 'per_page')
-        $perPage = $request->query('per_page', 10); // Valor por defecto 10
-        // Obtiene la página actual (parámetro 'page')
-        $page = $request->query('page', 1); // Valor por defecto 1
-
-        // Llama al servicio para obtener los pacientes filtrados y paginados
-        // MODIFICADO: Pasando $perPage, $page y $searchQuery
+        $perPage = $request->query('per_page', 10); 
+        $page = $request->query('page', 1); 
         $patients = $this->patientService->getAllPatients($request , $searchQuery, $orderBy = 'name');
 
-        // Ya no necesitas el if ($pacientes->isEmpty()) y lanzar una excepción aquí,
-        // porque el paginador de Laravel ya devuelve una colección vacía si no hay resultados,
-        // lo cual es una respuesta JSON válida para el frontend.
+        return response()->json($patients);
+    }
+
+    public function listActivePatients()
+    {
+        //TODO: chequear si funciona o no.
+        $patients = $this->patientService->getAllActivePatients();
 
         return response()->json($patients);
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create(array $data) : ?Patient
-    {
-        return null;
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePatientRequest $request): JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'cuil' => 'required|string|max:20|unique:patients,cuil',
-            'email' => 'required|email|unique:patients,email',
-            'phone' => 'nullable|string|max:20',
-            'phone_opt' => 'nullable|string|max:20',
-            'observations' => 'nullable|string|max:500',
-            'birth_date' => 'nullable|date',
-            'gender' => 'nullable|string|max:10',
-            'address' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:100',
-            'province' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'medical_coverage' => 'nullable|string|max:255',
-            'preferred_modality' => 'nullable|string|max:50',
-        ]);
-
-        return $this->patientService->registerPatient($request->all());
+        $dto = PatientRequestDTO::fromRequest($request->validated());
+        $patient = $this->patientService->registerPatient($dto);
+        return response()->json([
+            'message' => 'Patient registered successfully',
+            'patient' => $patient
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
-    {
+    {        
         $id = (int)$id; 
         $patient = $this->patientService->findPatientById($id);
 
@@ -101,43 +82,14 @@ class PatientController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdatePatientRequest $request, string $id)
     {
-        $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'last_name' => 'sometimes|string|max:255',
-            'cuil' => [
-                'sometimes',
-                'string',
-                'max:11',
-                Rule::unique('patients')->ignore($id),
-            ],
-            'email' => [
-                'sometimes',
-                'email',
-                Rule::unique('patients')->ignore($id),
-            ],
-            'phone' => 'nullable|string|max:20',
-            'phone_opt' => 'nullable|string|max:20',
-            'observations' => 'nullable|string|max:500',
-            'birth_date' => 'nullable|date',
-            'gender' => 'nullable|string|max:10',
-            'address' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:100',
-            'province' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'medical_coverage' => 'nullable|string|max:255',
-            'preferred_modality' => 'nullable|string|max:50',
-            'is_active' => 'sometimes|boolean',
-        ]);
-        $patient = $this->patientService->updatePatient($id, $request->all());
-        if (!$patient) {
-            return response()->json(['message' => 'Patient not found'], 404);
-        }
+        $dto = PatientUpdateRequestDTO::fromRequest($request->validated());
+        $patient = $this->patientService->updatePatient($id, $dto);
         return response()->json([
             'message' => 'Patient updated successfully',
             'patient' => $patient
-        ]);
+        ], 200);
     }
     
     /**

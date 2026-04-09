@@ -38,8 +38,7 @@ class ProfessionalScheduleController extends Controller
     public function store(Request $request)
     {
          $request->validate([
-            'days_of_week' => 'required|array',       // Asegura que 'days' exista y sea un array
-            
+            'days_of_week' => 'required|array',
         ]);
         $schedules = $this->professionalScheduleService->store( $request, 'start_time');
 
@@ -90,6 +89,8 @@ class ProfessionalScheduleController extends Controller
 
     public function destroy(int $id)
     {
+        //TODO: pasar al service la logica de búsqueda y eliminación del horario
+        
         $schedule = $this->professionalScheduleService->findScheduleById($id);
 
         if (!$schedule) {

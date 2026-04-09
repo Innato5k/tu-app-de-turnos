@@ -22,28 +22,30 @@ use App\Http\Controllers\ProfessionalAppointmentsController;
 
 // Rutas públicas
 Route::group(['prefix' => 'auth'], function () {
-    Route::post('register', [AuthController::class, 'register']);
+    //Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
 });
 
 // Rutas protegidas
-Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'auth'], function () {
+Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' => 'auth'], function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']); 
-    Route::get('me', [AuthController::class, 'me']); // Para obtener info del usuario autenticado
+    Route::get('me', [AuthController::class, 'me']);
 });
 
 // Rutas protegidas para la gestión de usuarios
-Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'usuarios'], function () {
+Route::group(['middleware' => ['jwt.auth','role:admin'], 'prefix' => 'usuarios'], function () {
     Route::get('/', [UserController::class, 'index']); 
-    Route::get('/{id}', [UserController::class, 'show']); 
+    Route::get('/{id}', [UserController::class, 'show'])->name('users.show');
     Route::put('/{id}', [UserController::class, 'update']); 
     Route::delete('/{id}', [UserController::class, 'destroy']);
+    Route::post('/', [UserController::class, 'store']);
 });
 
 // Rutas protegidas para la gestión de Pacientes
-Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'patients'], function () {
+Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' => 'patients'], function () {
     Route::get('/', [PatientController::class, 'index']); 
+    Route::get('/listActivePatients', [PatientController::class, 'listActivePatients']); 
     Route::get('/{id}', [PatientController::class, 'show']); 
     Route::put('/{id}', [PatientController::class, 'update']); 
     Route::delete('/{id}', [PatientController::class, 'destroy']);
@@ -51,7 +53,7 @@ Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'patients'], function ()
 });
 
 // Rutas protegidas para la gestión de Profesional Schedules
-Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'professionalSchedule'], function () {
+Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' => 'professionalSchedule'], function () {
     Route::get('/', [ProfessionalScheduleController::class, 'index']); 
     Route::get('/{id}', [ProfessionalScheduleController::class, 'show']); 
     Route::get('/user/{id}', [ProfessionalScheduleController::class, 'showByUserId']); 
@@ -60,7 +62,7 @@ Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'professionalSchedule'],
     Route::post('/', [ProfessionalScheduleController::class, 'store']);
 });
 // Rutas protegidas para la gestión de Available Slots y appointments
-Route::group(['middleware' => ['jwt.auth'], 'prefix' => 'professionalAppointments'], function () {
+Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' => 'professionalAppointments'], function () {
     Route::get('/', [ProfessionalAppointmentsController::class, 'index']); 
     Route::get('/{id}', [ProfessionalAppointmentsController::class, 'show']); 
     Route::get('/user/{id}', [ProfessionalAppointmentsController::class, 'showByUserId']); 

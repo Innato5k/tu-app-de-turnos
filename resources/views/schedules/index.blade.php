@@ -24,7 +24,7 @@
 <!-- Modal para confirmar reserva -->
 
 <div class="modal fade" id="reservationModal" tabindex="-1" aria-labelledby="reservationModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalTitle">Confirmar Reserva</h5>
@@ -35,9 +35,17 @@
                     <input type="hidden" id="slotIdInput" name="available_slot_id">
                     
                     <p>Usted está a punto de reservar este turno. Por favor, complete los detalles:</p>
-                    
+
+                    <!-- traer info de los pacientes, un select con buscador-->
                     <div class="mb-3">
-                        <label for="modality" class="form-label">Modalidad</label>
+                        <label for="patientSelect" class="form-label">Paciente</label><!-- autorellenear con la info defauls seleccionada, modificable-->
+                        <select class="form-select" id="patientSelect" name="patientSelect" required>
+                            <option value="">Buscar paciente por Nombre, Apellido o DNI</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="modality" class="form-label">Modalidad</label><!-- autorellenear con la info defauls seleccionada, modificable-->
                         <select class="form-select" id="modality" name="modality" required>
                             <option value="">Seleccione una opción</option>
                             <option value="presencial">Presencial</option>
@@ -46,8 +54,25 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="cost" class="form-label">Costo ($)</label>
+                        <label for="cost" class="form-label">Costo ($)</label><!-- autorellenear con la info defauls seleccionada, modificable-->
                         <input type="number" class="form-control" id="cost" name="cost" required value="5000" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="duration" class="form-label">Duracion de la sesion</label>
+                        <select class="form-select" id="duration" name="duration" required>
+                            <option value="presencial">30 minutos</option>
+                            <option value="virtual">1 hora</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="repeat" class="form-label">Se repite cada: </label>
+                        <select class="form-select" id="repeat" name="repeat" required>
+                            <option value="presencial">semanal</option>
+                            <option value="virtual">quincenal</option>
+                            <option value="virtual">mensual</option>
+                        </select>
                     </div>
 
                     <div class="mb-3">
