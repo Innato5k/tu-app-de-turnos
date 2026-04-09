@@ -1,0 +1,141 @@
+/* Estilos personalizados para el cuerpo y el fondo */
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(to right bottom, #e0f7fa, #e8f5e9);
+}
+
+/* Ajustes para el spinner de carga del modal */
+#tipLoading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3em;
+}
+
+/* Ajuste para el color de texto del botón de inicio de sesión */
+.btn-info.text-white {
+    color: #fff !important;
+}
+
+/* --- ESTILOS FULLCALENDAR PERSONALIZADOS --- */
+.fc-v-event .fc-event-main {
+    font-weight: bold !important;
+    /* Asegura que el texto de los eventos sea negrita */
+    color: #383333 !important;
+}
+
+#contenedorCalendar {
+    background-color: #dcdcdc; /* Fondo blanco para el contenedor del calendario */
+    border-radius: 0.5rem;    /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    padding: 1rem;            /* Espaciado interno */
+}
+
+/* Colores de eventos personalizados*/
+
+/* --- ESTILOS FULLCALENDAR PERSONALIZADOS POR ESTADO --- */
+
+/* 1. DISPONIBLE */
+.fc .fc-event.fc-event-available {
+    background-color: #d2f3e7 !important; 
+    border-color: #567c6e !important;   
+    color: #155724 !important;       
+}
+
+/* 2. AGENDADO */
+.fc .fc-event.fc-event-booked {
+    background-color: #72acc1 !important; 
+    border-color: #015f7e !important;    
+    color: #015f7e !important;          /
+}
+
+/* 3. BLOQUEADO POR PROFESIONAL  */
+.fc .fc-event.fc-event-blocked {
+    background-color: #f8d7da !important; 
+    border-color: #dc3545 !important;    
+    color: #721c24 !important;           
+    opacity: 0.8;                        
+    font-style: italic;                 
+    border-left: 5px solid #ff0000 !important; 
+}
+
+/* --- ESTADOS DE PACIENTE Y PAGO --- */
+/* 4. AUSENTE  */
+.fc .fc-event.fc-event-absent {
+    background-color: #FFB6B9 !important; 
+    border-color: #6f4041 !important;    
+    color: #39181a !important;         
+    opacity: 0.7;                       
+    text-decoration: line-through;      
+}
+
+/* 5. PRESENTE PAGADO */
+.fc .fc-event.fc-event-paid {
+    background-color: #77DD77 !important; 
+    border-color: #234a23 !important;    
+    color: #0e320e !important;           
+    font-weight: bold;                   
+}
+
+/* 6. PRESENTE DEUDA */
+.fc .fc-event.fc-event-debt {
+    background-color: #FFECB3 !important; 
+    border-color: #675c3a !important;    
+    color: #3b3113 !important;           
+    font-weight: bold;                   
+} 
+
+/* 7. CANCELADO  */
+.fc .fc-event.fc-event-canceled {
+    background-color: #FFDAB9 !important; 
+    border-color: #6f543d !important;    
+    color: #2f1c0d !important;           
+    opacity: 0.6;                        
+    text-decoration: line-through;      
+}
+/* 8. EXTRA  */
+.fc .fc-event.fc-event-extra {
+    background-color: #bb90d6 !important; 
+    border-color: #5c446b !important;    
+    color: #2f143f !important;           
+    font-weight: bold;                   
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.4); 
+    border-left: 5px solid #8501d7 !important; 
+}
+
+
+/* Estilo para los botones de navegación de FullCalendar */
+.fc .fc-button-primary {
+    background-color: var(--bs-primary) !important;
+    border-color: var(--bs-primary) !important;
+    color: #fff !important;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: var(--bs-primary-hover) !important;
+    border-color: var(--bs-primary-hover) !important;
+}
+
+.fc a {
+    color: var(--bs-info);
+    /* Usa tu color info para enlaces si lo prefieres */
+    text-decoration: none;
+}
+
+/* Personalizar las cabeceras de los días */
+.fc .fc-col-header-cell-cushion {
+    font-weight: 600;
+    color: #343a40;
+}
+
+/* Personalizar las franjas horarias */
+.fc .fc-timegrid-slot-label-cushion {
+    font-weight: 500;
+    color: #6c757d;
+}
+
+/* Sombra y bordes para el calendario principal */
+.fc {
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}

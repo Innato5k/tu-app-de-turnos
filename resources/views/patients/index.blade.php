@@ -20,7 +20,7 @@
                 </button>
             </div>
 
-            
+
         </div>
 
         <a href="{{ route('patients.create') }}" class="btn btn-primary fw-semibold">
@@ -95,7 +95,5 @@
 </div>
 @endsection
 @section('scripts')
-<script type="module" src="{{ asset('js/patients/patients.js') }}">
-
-</script>
+@vite('resources/js/patients/patients.js')
 @endsection

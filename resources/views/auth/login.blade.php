@@ -90,5 +90,5 @@
 @endsection {{-- Cierra la sección 'content' --}}
 
 @section('scripts') {{-- Abre la sección 'scripts' para scripts específicos --}}
-    <script type="module" src="{{ asset('js/login.js') }}"></script>
+    @vite('resources/js/login.js') 
 @endsection {{-- Cierra la sección 'scripts' --}}

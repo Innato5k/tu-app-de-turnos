@@ -200,8 +200,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             medical_coverage: medicalCoverageInput.value,
             preferred_modality: preferredModalityInput.value,
             is_active: isActiveInput.checked, 
-            
-            // Si hay otros campos, agrégalos aquí
         };
 
         try {

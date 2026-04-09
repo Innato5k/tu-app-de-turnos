@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Services\UserService; // Importa tu UserService
-use App\Models\User; // Para el type-hinting en respuestas
-use Illuminate\Validation\Rule;
+use App\Services\UserService;
+use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
+use App\DTOs\User\UserUpdateRequestDTO;
+use App\DTOs\User\UserRequestDTO;
+use App\Http\Resources\User\UserResource;
 
 class UserController extends Controller
 {
@@ -31,7 +33,7 @@ class UserController extends Controller
     public function index()
     {
         $users = $this->userService->getAllUsers();
-        return response()->json($users);
+        return UserResource::collection($users);
     }
 
     /**
@@ -43,49 +45,41 @@ class UserController extends Controller
      */
     public function show(int $id)
     {
-        $user = $this->userService->findUserById($id);
-
-        if (!$user) {
+        try {
+            $user = $this->userService->findUserById($id);
+            return new UserResource($user);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'User not found'], 404);
         }
+    }
 
-        return response()->json($user);
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(StoreUserRequest $request)
+    {
+        $dto = UserRequestDTO::fromRequest($request);
+        $user = $this->userService->registerUser($dto);
+        return new UserResource($user);
     }
 
     /**
      * Actualiza un usuario específico.
      * Requiere autenticación JWT.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\User\UpdateUserRequest $request
      * @param int $id El ID del usuario a actualizar.
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, int $id)
+    public function update(UpdateUserRequest $request, int $id)
     {
-        $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'lastname' => 'sometimes|string|max:255',
-            'cuil' => 'sometimes|string|max:255',
-            'email' => [
-                'sometimes',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($id),
-            ],
-            'password' => 'sometimes|string|min:8|confirmed',
-        ]);
-
-        $user = $this->userService->updateUser($id, $request->all());
-
-        if (!$user) {
+        try {
+            $dto = UserUpdateRequestDTO::fromRequest($request);
+            $user = $this->userService->updateUser($id, $dto);
+            return new UserResource($user);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'User not found'], 404);
         }
-
-        return response()->json([
-            'message' => 'User updated successfully',
-            'user' => $user
-        ]);
     }
 
     /**
@@ -97,12 +91,13 @@ class UserController extends Controller
      */
     public function destroy(int $id)
     {
-        $deleted = $this->userService->deleteUser($id);
-
-        if (!$deleted) {
-            return response()->json(['message' => 'User not found or could not be deleted'], 404);
+        try {
+            if( !$this->userService->deleteUser($id) ) {
+                return response()->json(['message' => 'Cannot delete yourself'], 403);
+            }
+            return response()->json(['message' => 'User deleted successfully'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'User not found'], 404);
         }
-
-        return response()->json(['message' => 'User deleted successfully'], 200);
     }
 }

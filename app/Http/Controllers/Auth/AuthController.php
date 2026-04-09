@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\User\UserResource;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -31,33 +31,6 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
-        // Validación de la solicitud
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'lastname' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email', 
-            'cuil' => 'required|unique:users,cuil',     
-            'password' => 'required|string|min:8|confirmed',
-            'national_md_lic' => 'nullable|string|max:255',
-            'provincial_md_lic' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'phone_opt' => 'nullable|string|max:20',
-            'speciality' => 'nullable|string|max:255',
-            'picture' => 'nullable|image|max:2048',
-        ]);         
-
-        // Llama al servicio para registrar el usuario
-        if ($user = $this->authService->registerUser($request->all())) {
-            $token = $this->authService->attemptLogin($request->email, $request->password);
-            return response()->json([
-                'message' => 'User registered successfully',
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-                'expires_in' => auth('api')->factory()->getTTL() * 60,
-                'user' => $this->authService->getUserFromToken($token),
-            ], 201);
-        }
-         return response()->json(['message' => 'User cuil or email allready registered.'], 409);
     }
 
     /**
@@ -83,8 +56,8 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'expires_in' => auth('api')->factory()->getTTL() * 60, // Duración del token en segundos
-            'user' => $this->authService->getUserFromToken($token), // Obtiene el usuario autenticado a través del token
+            'expires_in' => auth('api')->factory()->getTTL() * 7200,
+            'user' => new UserResource($this->authService->getUserFromToken($token)),
         ]);
     }
 
@@ -123,6 +96,7 @@ class AuthController extends Controller
      */
     public function me()
     {
+        //TODO: Chequear si funciona o no, y si devuelve lo que quiero o no.
         return response()->json($this->authService->getAuthenticatedUser());
     }
 }

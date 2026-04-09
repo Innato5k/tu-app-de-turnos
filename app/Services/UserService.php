@@ -5,20 +5,46 @@ namespace App\Services;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\DTOs\User\UserRequestDTO;
+use App\DTOs\User\UserResponseDTO;
+use App\DTOs\User\UserUpdateRequestDTO;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UserService
 {
 
-    
+
     /**
      * Obtiene todos los usuarios.
      *
      * @return \Illuminate\Database\Eloquent\Collection<User>
      */
-    public function getAllUsers(): Collection
+    public function getAllUsers(): LengthAwarePaginator
     {
-        return User::all();
+
+
+        $query = User::query();
+
+        return $query->paginate(10);
+
+        //TODO: cuando tenga el Paginado, acomodar con los campos de User
+        /*if ($searchQuery) {
+            $query->where(function ($q) use ($searchQuery) {
+                $q->where('name', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
+                    ->orWhere('email', 'like', '%' . $searchQuery . '%');
+            });
+        }
+
+        $perPage = $request->input('per_page', 10);
+        $page = $request->input('page', 1);*/
+
+        //return $query->paginate($perPage, ['*'], 'page', $page)->through(fn($patient) => PatientResponseDTO::fromModel($patient));
+
+
     }
 
     /**
@@ -29,7 +55,7 @@ class UserService
      */
     public function findUserById(int $id): ?User
     {
-        return User::find($id);
+        return User::findOrFail($id);
     }
 
     /**
@@ -39,66 +65,41 @@ class UserService
      * @param array $data Los datos a actualizar. Puede incluir 'name', 'email', 'password'.
      * @return \App\Models\User|null El usuario actualizado, o null si no se encontró.
      */
-    public function updateUser(int $id, array $data): ?User
+    public function updateUser(int $id, UserUpdateRequestDTO $dto): ?User
     {
         $user = $this->findUserById($id);
 
-        if (!$user) {
-            return null;
-        }
-        // Validación de datos
-        if (empty($data['national_md_lic']) && empty($data['provincial_md_lic'])) {
-            throw ValidationException::withMessages([
-            'license' => ['National or Provincial medical license is required.'],
-            ]);
-        }
-        if (User::where('cuil', $data['cuil'])->where('id', '!=', $id)->exists() || User::where('email', $data['email'])->where('id', '!=', $id)->exists()) {
-            throw ValidationException::withMessages([
-            'license' => ['Cuil or email already registered.'],]); 
-        }
-        if (User::where('national_md_lic', $data['national_md_lic'])->where('id', '!=', $id)->exists() || User::where('provincial_md_lic', $data['provincial_md_lic'])->where('id', '!=', $id)->exists()) {
-            throw ValidationException::withMessages([
-            'license' => ['National or Provincial medical license already registered.'],]); 
-        }
-               
+        $user->update($dto->toArray());
 
+        return $user;
+    }
 
-        // Actualización de los campos del usuario
-        if (isset($data['name'])) {
-            $user->name = $data['name'];
-        }
-        if (isset($data['lastname'])) {
-            $user->last_name = $data['lastname'];
-        }
-        if (isset($data['cuil'])) {
-            $user->cuil = $data['cuil'];
-        }
-        if (isset($data['email'])) {
-            $user->email = $data['email'];
-        }
-        if (isset($data['password'])) {
-            $user->password = Hash::make($data['password']);
-        }
-        if (isset($data['national_md_lic'])) {
-            $user->national_md_lic = $data['national_md_lic'];
-        }
-        if (isset($data['provincial_md_lic'])) {
-            $user->provincial_md_lic = $data['provincial_md_lic'];
-        }
-        if (isset($data['phone'])) {
-            $user->phone = $data['phone'];
-        }
-        if (isset($data['phone_opt'])) {
-            $user->phone_opt = $data['phone_opt'];
-        }
-        if (isset($data['speciality'])) {
-            $user->speciality = $data['speciality'];
-        }
-        if (isset($data['picture'])) {
-            $user->picture = $data['picture'];
-        }
+    /**
+     * Registra un nuevo usuario.
+     *
+     * @param \App\DTOs\User\UserRequestDTO $dto
+     * @return User El usuario registrado.
+     */
+    public function registerUser(UserRequestDTO $dto): User
+    {
+        $plainPassword = Str::password(12);
 
-        $user->save();
+        $user = User::create([
+            'name'               => $dto->name,
+            'last_name'          => $dto->last_name,
+            'cuil'               => $dto->cuil,
+            'email'              => $dto->email,
+            'phone'              => $dto->phone,
+            'phone_opt'          => $dto->phone_opt,
+            'password'           => Hash::make($plainPassword),
+            'national_md_lic'    => $dto->national_md_lic,
+            'provincial_md_lic'  => $dto->provincial_md_lic,
+            'speciality'         => $dto->speciality,
+            'is_active'          => $dto->is_active,
+        ]);
+
+        $user->assignRole('professional');
+        $user->temporary_password = $plainPassword;
 
         return $user;
     }
@@ -111,12 +112,10 @@ class UserService
      */
     public function deleteUser(int $id): bool
     {
-        $user = $this->findUserById($id);
-
-        if (!$user || auth('api')->id() == $id) {
+        if (auth()->id() === $id) {
             return false;
         }
-
+        $user = $this->findUserById($id);
         return $user->delete();
     }
 }

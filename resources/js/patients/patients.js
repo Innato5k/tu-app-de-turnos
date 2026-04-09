@@ -52,10 +52,12 @@ function redirectToLogin(message) {
  * Carga los pacientes desde la API y actualiza la tabla y la paginación.
  * @param {number} page Número de página a cargar.
  */
-async function fetchPatients(page = 1, searchQuery = '') { // MODIFICADO: Añadido searchQuery como parámetro
+async function fetchPatients(page = 1, searchQuery = '') { 
     const token = getAuthToken();
+   
 
     if (!token) {
+        
         redirectToLogin('No autenticado. Por favor, inicia sesión.');
         return;
     }
@@ -89,6 +91,7 @@ async function fetchPatients(page = 1, searchQuery = '') { // MODIFICADO: Añadi
         });
 
         if (response.status === 401 || response.status === 403) {
+            
             redirectToLogin('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
             return;
         }
@@ -133,7 +136,7 @@ function populateTable(patients) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td class="py-3 px-4 text-muted">${patient.id || ''}</td>
-            <td class="py-3 px-4 text-dark">${patient.name || ''} ${patient.last_name || ''}</td>
+            <td class="py-3 px-4 text-dark">${patient.name || ''}</td>
             <td class="py-3 px-4 text-muted">${patient.email || ''}</td>
             <td class="py-3 px-4 text-muted">${patient.phone || ''}</td>
             <td class="py-3 px-4 text-center">
@@ -256,6 +259,11 @@ async function deletePatient(patientId) {
 
         // Si la eliminación fue exitosa, oculta el modal y recarga la lista de pacientes
         deleteConfirmationModal.hide();
+        document.body.classList.remove('modal-open');
+        const backdrops = document.getElementsByClassName('modal-backdrop');
+        while(backdrops.length > 0){
+            backdrops[0].parentNode.removeChild(backdrops[0]);
+        }
         alert('Paciente eliminado exitosamente.'); // Considera un modal de éxito
         fetchPatients(); // Recarga la lista para reflejar el cambio
 
@@ -265,6 +273,7 @@ async function deletePatient(patientId) {
     } finally {
         // Oculta el spinner y habilita el botón de confirmación
         deleteSpinner.classList.add('hidden');
+       
         confirmDeleteButton.disabled = false;
         patientToDeleteId = null; // Limpia el ID del paciente a eliminar
     }
