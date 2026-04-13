@@ -34,7 +34,7 @@ Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' =
 });
 
 // Rutas protegidas para la gestión de usuarios
-Route::group(['middleware' => ['jwt.auth','role:admin'], 'prefix' => 'usuarios'], function () {
+Route::group(['middleware' => ['jwt.auth','role:admin'], 'prefix' => 'users'], function () {
     Route::get('/', [UserController::class, 'index']); 
     Route::get('/{id}', [UserController::class, 'show'])->name('users.show');
     Route::put('/{id}', [UserController::class, 'update']); 

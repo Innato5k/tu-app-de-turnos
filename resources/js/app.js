@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const userNameDisplay = document.getElementById('userNameDisplay');
     const logoutButton = document.getElementById('logoutButton');
     const loginLink = document.getElementById('loginLink');
-    const linkInicio = document.getElementById('linkInicio');
+    const linkInicio = document.getElementById('linkInicio');    
+    const linkUsuarios = document.getElementById('linkUsuarios');
     const linkHoraiosProfesional = document.getElementById('linkHoraiosProfesional');
     const linkMisTurnos = document.getElementById('linkMisTurnos');
     const linkPacientes = document.getElementById('linkPacientes');
@@ -18,11 +19,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Si hay un token y info de usuario, el usuario está "logueado" en el front-end
         try {
             const user = JSON.parse(userInfo);
-            userNameDisplay.textContent = `Hola, ${user.name}!`;
+            userNameDisplay.textContent = `Hola, ${user.fullName}!`;
             userNameDisplay.classList.remove('d-none'); // Muestra el nombre
             logoutButton.classList.remove('d-none'); // Muestra el botón de logout
             loginLink.classList.add('d-none'); // Oculta el enlace de login
             linkInicio.classList.remove('d-none'); // Oculta el menú de navegación no autenticado
+            linkUsuarios.classList.remove('d-none');//TODO: ver de ocultar este link para profesionales
             linkHoraiosProfesional.classList.remove('d-none');
             linkMisTurnos.classList.remove('d-none');
             linkPacientes.classList.remove('d-none');
@@ -33,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutButton.classList.add('d-none');
             loginLink.classList.remove('d-none');
             linkInicio.classList.add('d-none');
+            linkUsuarios.classList.add('d-none');
             linkHoraiosProfesional.classList.add('d-none');
             linkMisTurnos.classList.add('d-none');
             linkPacientes.classList.add('d-none');
@@ -44,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutButton.classList.add('d-none');
         loginLink.classList.remove('d-none');
         linkInicio.classList.add('d-none');
+        linkUsuarios.classList.add('d-none');
         linkHoraiosProfesional.classList.add('d-none');
         linkMisTurnos.classList.add('d-none');
         linkPacientes.classList.add('d-none');

@@ -62,13 +62,13 @@
 
     {{-- Controles de paginación --}}
     <div>
-
         <nav aria-label="Paginación de pacientes" class="mt-4">
             <ul class="pagination justify-content-center" id="patientsPagination">
 
             </ul>
         </nav>
     </div>
+    
     {{-- Modal de Confirmación de Eliminación --}}
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

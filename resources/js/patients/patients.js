@@ -122,6 +122,7 @@ async function fetchPatients(page = 1, searchQuery = '') {
  */
 function populateTable(patients) {
     patientsTableBody.innerHTML = ''; // Limpia las filas existentes
+    
 
     if (!Array.isArray(patients) || patients.length === 0) {
         patientsTableBody.innerHTML = `

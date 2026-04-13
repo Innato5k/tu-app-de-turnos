@@ -3,15 +3,13 @@
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use App\DTOs\User\UserRequestDTO;
 use App\DTOs\User\UserResponseDTO;
 use App\DTOs\User\UserUpdateRequestDTO;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
 
 class UserService
 {
@@ -22,16 +20,16 @@ class UserService
      *
      * @return \Illuminate\Database\Eloquent\Collection<User>
      */
-    public function getAllUsers(): LengthAwarePaginator
+    public function getAllUsers(Request $request, ?string $searchQuery = null, ?string $orderBy = null): LengthAwarePaginator
     {
 
 
         $query = User::query();
 
-        return $query->paginate(10);
+        //return $query->paginate(10);
 
         //TODO: cuando tenga el Paginado, acomodar con los campos de User
-        /*if ($searchQuery) {
+        if ($searchQuery) {
             $query->where(function ($q) use ($searchQuery) {
                 $q->where('name', 'like', '%' . $searchQuery . '%')
                     ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
@@ -39,10 +37,10 @@ class UserService
             });
         }
 
-        $perPage = $request->input('per_page', 10);
-        $page = $request->input('page', 1);*/
+        $perPage = $request->input('per_page', 5);
+        $page = $request->input('page', 1);
 
-        //return $query->paginate($perPage, ['*'], 'page', $page)->through(fn($patient) => PatientResponseDTO::fromModel($patient));
+        return $query->paginate($perPage, ['*'], 'page', $page);
 
 
     }
