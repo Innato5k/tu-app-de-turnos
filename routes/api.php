@@ -46,7 +46,7 @@ Route::group(['middleware' => ['jwt.auth','role:admin'], 'prefix' => 'users'], f
 Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' => 'patients'], function () {
     Route::get('/', [PatientController::class, 'index']); 
     Route::get('/listActivePatients', [PatientController::class, 'listActivePatients']); 
-    Route::get('/{id}', [PatientController::class, 'show']); 
+    Route::get('/{id}', [PatientController::class, 'show'])->name('Patients.show'); 
     Route::put('/{id}', [PatientController::class, 'update']); 
     Route::delete('/{id}', [PatientController::class, 'destroy']);
     Route::post('/', [PatientController::class, 'store']);

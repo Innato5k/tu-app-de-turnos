@@ -2,40 +2,40 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletes; // IMPORTANTE
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Patient extends Model
 {
-    use HasFactory,SoftDeletes;
-       /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    use HasFactory, SoftDeletes; // Habilitamos SoftDeletes
+
     protected $fillable = [
-            'name',
-            'last_name',
-            'cuil',
-            'email',
-            'phone',
-            'phone_opt',
-            'observations',
-            'birth_date',
-            'gender',
-            'address',
-            'city',
-            'province',
-            'postal_code',
-            'medical_coerage',
-            'preferred_modality',
-            'is_active',
-            'is_deleted',
-    ];
-    protected $casts = [
-        // 'email_verified_at' => 'datetime', // Si tienes esta columna
-        'is_active' => 'boolean', // ¡Añade o confirma esta línea!
+        'name',
+        'last_name',
+        'cuil',
+        'birth_date',
+        'gender',
+        'medical_history',
+        'email',
+        'phone',
+        'phone_opt',
+        'address',
+        'city',
+        'province',
+        'postal_code',
+        'medical_coverage',
+        'affiliate_number',
+        'preferred_modality',
+        'observations',
+        'institution_id',
+        'created_by_id',
     ];
 
+    protected $casts = [
+        'birth_date' => 'date',
+        'institution_id' => 'integer',
+        'created_by_id' => 'integer',
+        'deleted_at' => 'datetime', 
+    ];
 }

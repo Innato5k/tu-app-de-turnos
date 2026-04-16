@@ -42,7 +42,7 @@ class PatientService
      */
     public function getAllPatients(Request $request, ?string $searchQuery = null, ?string $orderBy = null): LengthAwarePaginator
     {
-        $query = Patient::query();
+        $query = Patient::withTrashed()->orderBy($orderBy ?? 'last_name');
 
         if ($searchQuery) {
             $query->where(function ($q) use ($searchQuery) {
@@ -54,7 +54,7 @@ class PatientService
 
         $perPage = $request->input('per_page', 10);
         $page = $request->input('page', 1);
-        return $query->paginate($perPage, ['*'], 'page', $page)->through(fn($patient) => PatientResponseDTO::fromModel($patient));
+        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function getAllActivePatients(): Collection
@@ -70,11 +70,9 @@ class PatientService
      * @param int $id
      * @return \App\Models\Patient|null
      */
-    public function findPatientById(int $id): ?PatientFullResponseDTO
+    public function findPatientById(int $id): ?Patient
     {
-        $patient = Patient::find($id);
-
-        return $patient ? PatientFullResponseDTO::fromModel($patient) : null;
+        return Patient::withTrashed()->findOrFail($id);
     }
 
     /**
@@ -82,36 +80,24 @@ class PatientService
      *
      * @param int $id
      * @param PatientRequestDTO $data Los datos a actualizar.
-     * @return PatientFullResponseDTO|null El paciente actualizado, o null si no se encontró.
+     * @return Patient|null El paciente actualizado, o null si no se encontró.
      */
-    public function updatePatient(int $id, PatientUpdateRequestDTO $data): ?PatientFullResponseDTO
+    public function updatePatient(int $id, PatientUpdateRequestDTO $data): ?Patient
     {
-        $patient = Patient::find($id);
-
-        if (!$patient) {
-            return null;
+        
+        $patient = $this->findPatientById($id);
+        
+        $patient->update($data->toArray());
+        
+        if (isset($data->is_active)) {
+            if ($data->is_active) {
+                $patient->restore();
+            } else {
+                $patient->delete();
+            }
         }
 
-        $patient->update([
-            'name'               => $data->name,
-            'last_name'          => $data->lastName,
-            'cuil'               => $data->cuil,
-            'email'              => $data->email,
-            'phone'              => $data->phone,
-            'phone_opt'          => $data->phoneOpt,
-            'observations'       => $data->observations,
-            'birth_date'         => $data->birthDate,
-            'gender'             => $data->gender,
-            'address'            => $data->address,
-            'city'               => $data->city,
-            'province'           => $data->province,
-            'postal_code'        => $data->postalCode,
-            'medical_coverage'   => $data->medicalCoverage,
-            'preferred_modality' => $data->preferredModality,
-            'is_active'          => $data->isActive,
-        ]);
-
-        return PatientFullResponseDTO::fromModel($patient->fresh());
+        return $patient;
     }
 
     /**
@@ -122,23 +108,10 @@ class PatientService
      */
     public function deletePatient(int $id): bool
     {
-
-        /*Tres cosas que tenés que saber ahora que usás Soft Delete:
-            Consultas Automáticas: A partir de ahora, Patient::all() o Patient::get() NO traerán a los pacientes borrados.
-            Es como si no existieran, lo cual es genial para tu listado de "Pacientes Activos".
-
-            Ver los Borrados: Si alguna vez necesitás un reporte de auditoría de quiénes fueron eliminados, usás:
-            Patient::onlyTrashed()->get();
-
-            Restaurar: Si el error fue humano y hay que volver atrás:
-                $patient->restore(); (esto limpia el deleted_at y el paciente vuelve a la vida).*/
-        $Patient = Patient::find($id);
-
-        if (!$Patient) {
+        if (auth()->id() === $id) {
             return false;
         }
-        $Patient->delete();
-
-        return $Patient->is_deleted = true; // Marca el paciente como eliminado
+        $patient = $this->findPatientById($id);
+        return $patient->delete();
     }
 }

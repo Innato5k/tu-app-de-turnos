@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Si hay un token y info de usuario, el usuario está "logueado" en el front-end
         try {
             const user = JSON.parse(userInfo);
-            userNameDisplay.textContent = `Hola, ${user.fullName}!`;
+            userNameDisplay.textContent = `Hola, ${user.full_name}!`;
             userNameDisplay.classList.remove('d-none'); // Muestra el nombre
             logoutButton.classList.remove('d-none'); // Muestra el botón de logout
             loginLink.classList.add('d-none'); // Oculta el enlace de login

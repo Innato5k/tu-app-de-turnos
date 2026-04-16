@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('patients', function (Blueprint $table) {
-            $table->renameColumn('medical_coerage', 'medical_coverage');  
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_active');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('patients', function (Blueprint $table) {
-            $table->renameColumn('medical_coverage', 'medical_coerage');
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('is_active')->default(true);
         });
     }
 };

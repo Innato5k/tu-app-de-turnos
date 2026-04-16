@@ -1,28 +1,22 @@
 document.addEventListener('DOMContentLoaded', async () => {
      // URLs de la API
-    const API_PATIENTS_BASE_URL = '/api/patients'; 
+    const API_userS_BASE_URL = '/api/users'; 
     const REDIRECT_LOGIN_URL = '/login'; // Ruta de login para redireccionar en caso de token inválido
-    const REDIRECT_PATIENTS_LIST_URL = '/patients'; // Ruta para volver al listado después de guardar
+    const REDIRECT_userS_LIST_URL = '/users'; // Ruta para volver al listado después de guardar
 
     // Elementos del DOM
-    const createPatientForm = document.getElementById('createPatientForm');
+    const createuserForm = document.getElementById('createuserForm');
     const nameInput = document.getElementById('name');
     const lastNameInput = document.getElementById('last_name');
-    const cuilInput = document.getElementById('cuil');
+    const cuilInput = document.getElementById('cuil');    
+    const birthDateInput = document.getElementById('birth_date');    
+    const genderInput = document.getElementById('gender');
     const emailInput = document.getElementById('email');
     const phoneInput = document.getElementById('phone');
     const phoneOptInput = document.getElementById('phone_opt');
-    const observationsInput = document.getElementById('observations');
-    const birthDateInput = document.getElementById('birth_date');
-    const genderInput = document.getElementById('gender');
-    const addressInput = document.getElementById('address');
-    const cityInput = document.getElementById('city');
-    const provinceInput = document.getElementById('province');
-    const postalCodeInput = document.getElementById('postal_code');
-    const medicalCoverageInput = document.getElementById('medical_coverage');
-    const preferred_modality = document.getElementById('preferred_modality');
-    const savePatientButton = document.getElementById('savePatientButton');
-    const patientMessage = document.getElementById('patientMessage');
+    const nationalMdLicInput = document.getElementById('national_md_lic');
+    const provincialMdLicInput = document.getElementById('provincial_md_lic');
+    const specialityInput = document.getElementById('speciality');
     
 
     // Función para obtener el token JWT del localStorage
@@ -32,9 +26,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Función para mostrar mensajes al usuario
     function showMessage(message, type = 'info') {
-        patientMessage.textContent = message;
-        patientMessage.classList.remove('text-success', 'text-danger', 'text-info');
-        patientMessage.classList.add(`text-${type}`);
+        userMessage.textContent = message;
+        userMessage.classList.remove('text-success', 'text-danger', 'text-info');
+        userMessage.classList.add(`text-${type}`);
     }
   
 
@@ -70,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Manejador de envío del formulario de edición
-    createPatientForm.addEventListener('submit', async (e) => {
+    createuserForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const token = getAuthToken();
@@ -89,47 +83,40 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        savePatientButton.disabled = true;
-        savePatientButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
+        saveuserButton.disabled = true;
+        saveuserButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
         showMessage('', 'info'); // Limpiar mensajes anteriores
 
         // Nuevo: Limpiar el CUIL antes de enviarlo al backend (quitar guiones)
         const cleanCuil = cuilInput.value.replace(/\D/g, '');
 
-        const updatedPatientData = {
+        const updateduserData = {
             name: nameInput.value,
             last_name: lastNameInput.value,
             cuil: cleanCuil,
             email: emailInput.value,
             phone: phoneInput.value,
             phone_opt: phoneOptInput.value,
-            observations: observationsInput.value,
             birth_date: birthDateInput.value ? new Date(birthDateInput.value).toISOString() : null,
-            gender: genderInput.value,
-            address: addressInput.value,
-            city: cityInput.value,
-            province: provinceInput.value,
-            postal_code: postalCodeInput.value,
-            medical_coverage: medicalCoverageInput.value,
-            preferred_modality: preferred_modality.value,
-            
-            
-            // Si hay otros campos, agrégalos aquí
+            national_md_lic: nationalMdLicInput.value,
+            provincial_md_lic: provincialMdLicInput.value,
+            speciality: specialityInput.value,  
+            gender: genderInput.value
         };
 
         try {
-            const response = await fetch(`${API_PATIENTS_BASE_URL}`, {
+            const response = await fetch(`${API_userS_BASE_URL}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(updatedPatientData)
+                body: JSON.stringify(updateduserData)
             });
 
             if (response.status === 401 || response.status === 403) {
-                alert('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.'); // Reemplazar con modal personalizado
+                alert('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.'); //TODO: Reemplazar con modal personalizado
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('token_type');
                 localStorage.removeItem('user_info');
@@ -142,19 +129,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error(errorData.message || 'Error al guardar los cambios.');
             }
 
-            // Si la respuesta es 200 OK (sin contenido) o devuelve el paciente actualizado
-            showMessage('Paciente actualizado exitosamente.', 'success');
-            // Opcional: Recargar los datos del paciente o redirigir
+            // Si la respuesta es 200 OK (sin contenido) o devuelve el usuario actualizado
+            showMessage('usuario actualizado exitosamente.', 'success');
+            // Opcional: Recargar los datos del usuario o redirigir
             setTimeout(() => {
-                window.location.href = REDIRECT_PATIENTS_LIST_URL; // Redirige al listado
+                window.location.href = REDIRECT_userS_LIST_URL; // Redirige al listado
             }, 1500);
 
         } catch (error) {
-            console.error('Error al guardar paciente:', error);
+            console.error('Error al guardar usuario:', error);
             showMessage(`Error: ${error.message}`, 'danger');
         } finally {
-            savePatientButton.disabled = false;
-            savePatientButton.textContent = 'Guardar Cambios';
+            saveuserButton.disabled = false;
+            saveuserButton.textContent = 'Guardar Cambios';
         }
     });    
 });

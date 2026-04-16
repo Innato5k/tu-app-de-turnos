@@ -115,23 +115,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             const patient = await response.json();
 
             // Llenar el formulario con los datos del paciente
-            patientIdInput.value = patient.id;
-            nameInput.value = patient.name || '';
-            lastNameInput.value = patient.last_name || '';
-            cuilInput.value = patient.cuil ? formatCuil(patient.cuil) : '';
-            emailInput.value = patient.email || '';
-            phoneInput.value = patient.phone || '';
-            phoneOptInput.value = patient.phone_opt || '';
-            observationsInput.value = patient.observations || '';
-            birthDateInput.value = patient.birth_date ? new Date(patient.birth_date).toISOString().split('T')[0] : '';
-            genderInput.value = patient.gender || '';
-            addressInput.value = patient.address || '';
-            cityInput.value = patient.city || '';
-            provinceInput.value = patient.province || '';
-            postalCodeInput.value = patient.postal_code || '';
-            medicalCoverageInput.value = patient.medical_coverage || '';
-            preferredModalityInput.value = patient.preferred_modality || '';
-            isActiveInput.checked = patient.is_active;   
+            patientIdInput.value = patient.data.id;
+            nameInput.value = patient.data.name || '';
+            lastNameInput.value = patient.data.last_name || '';
+            cuilInput.value = patient.data.cuil ? formatCuil(patient.data.cuil) : '';
+            emailInput.value = patient.data.email || '';
+            phoneInput.value = patient.data.phone || '';
+            phoneOptInput.value = patient.data.phone_opt || '';
+            observationsInput.value = patient.data.observations || '';
+            birthDateInput.value = patient.data.birth_date ? new Date(patient.data.birth_date).toISOString().split('T')[0] : '';
+            genderInput.value = patient.data.gender || '';
+            addressInput.value = patient.data.address || '';
+            cityInput.value = patient.data.city || '';
+            provinceInput.value = patient.data.province || '';
+            postalCodeInput.value = patient.data.postal_code || '';
+            medicalCoverageInput.value = patient.data.medical_coverage || '';
+            preferredModalityInput.value = patient.data.preferred_modality || '';
+            isActiveInput.checked = patient.data.is_active;   
             ageInput.value = calculateAge(birthDateInput.value) || '';        
 
 

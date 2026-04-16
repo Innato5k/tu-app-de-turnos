@@ -35,7 +35,8 @@
                     <thead class="bg-light">
                         <tr>
                             <th scope="col" class="py-3 px-4">ID</th>
-                            <th scope="col" class="py-3 px-4">Usuario</th>
+                            <th scope="col" class="py-3 px-4">Usuario</th>                            
+                            <th scope="col" class="py-3 px-4">Cuil</th>
                             <th scope="col" class="py-3 px-4">Teléfono</th>
                             <th scope="col" class="py-3 px-4">Rol</th>
                             <th scope="col" class="py-3 px-4 text-center">Estado</th>
@@ -82,6 +83,50 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal de Edición/Creación de Usuario --}}
+    
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="userForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalLabel">Nuevo Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="userId"> <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" name="full_name" id="userFullName" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">CUIL (11 dígitos)</label>
+                        <input type="text" name="cuil" id="userCuil" class="form-control" maxlength="11" required>
+                    </div>
+                    <div class="mb-3 col-md-2">
+                        <label for="birth_date" class="form-label text-dark small">Fecha de Nacimiento</label>
+                        <input type="date" id="birth_date" name="birth_date" class="required form-control form-control-sm border-secondary" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" id="userEmail" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Rol</label>
+                        <select name="role" id="userRole" class="form-select">
+                            <option value="profesional">Profesional</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 </div>
 @endsection
 

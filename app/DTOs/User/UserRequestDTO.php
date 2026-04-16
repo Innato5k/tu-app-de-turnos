@@ -17,22 +17,26 @@ use App\Http\Requests\User\StoreUserRequest;
         public int $national_md_lic,
         public int $provincial_md_lic,
         public String $speciality,
-        public bool $is_active,
+        public ?string $birth_date,
+        public ?string $gender,
     ) {}
 
-    public static function fromRequest(StoreUserRequest $request): self
-    {
+    public static function fromRequest(array $request): self
+    {        
         return new self(
-            name: $request->validated('name'),
-            last_name: $request->validated('last_name'),
-            cuil: $request->validated('cuil'),
-            email: $request->validated('email'),
-            phone: $request->validated('phone') ?? null,
-            phone_opt: $request->validated('phone_opt') ?? null,
-            national_md_lic: $request->validated('national_md_lic') ?? null,
-            provincial_md_lic: $request->validated('provincial_md_lic') ?? null,
-            speciality: $request->validated('speciality') ?? null,
-            is_active: (bool) ($request->validated('is_active') ?? true),
+            name: $request['name'],
+            last_name: $request['last_name'],
+            cuil: $request['cuil'],
+            email: $request['email'],
+            phone: $request['phone'] ?? null,
+            phone_opt: $request['phone_opt'] ?? null,
+            national_md_lic: $request['national_md_lic'] ?? null,
+            provincial_md_lic: $request['provincial_md_lic'] ?? null,
+            speciality: $request['speciality'] ?? null,
+            birth_date: isset($request['birth_date'])
+                ? \Carbon\Carbon::parse($request['birth_date'])->format('Y-m-d')
+                : null,
+            gender: $request['gender'] ?? null,
         );
     }
 

@@ -64,7 +64,7 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        $dto = UserRequestDTO::fromRequest($request);
+        $dto = UserRequestDTO::fromRequest($request->validated());         
         $user = $this->userService->registerUser($dto);
         return new UserResource($user);
     }
@@ -80,7 +80,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, int $id)
     {
         try {
-            $dto = UserUpdateRequestDTO::fromRequest($request);
+            $dto = UserUpdateRequestDTO::fromRequest($request->validated());     
             $user = $this->userService->updateUser($id, $dto);
             return new UserResource($user);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {

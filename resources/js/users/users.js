@@ -27,6 +27,10 @@ const statusSpinner = document.getElementById('statusSpinner');
 let userToToggleId = null;
 let isUserInactive = false;
 
+//variables para el modal de edición/creación
+const userModal = new bootstrap.Modal(document.getElementById('userModal'));
+const userForm = document.getElementById('userForm');
+
 // =====================================================================
 // 2. FUNCIONES DE UTILIDAD
 // =====================================================================
@@ -96,9 +100,8 @@ function populateTable(users) {
     }
 
     users.forEach(user => {
-        const isInactive = user.deleted_at !== null;
+        const isActive = user.is_active;
         const row = document.createElement('tr');
-        if (isInactive) row.classList.add('opacity-50', 'bg-light');
 
         row.innerHTML = `
             <td class="py-3 px-4 text-muted">${user.id}</td>
@@ -106,6 +109,7 @@ function populateTable(users) {
                 <div class="fw-bold text-dark">${user.full_name}</div>
                 <small class="text-muted">${user.email}</small>
             </td>
+             <td class="py-3 px-4 text-muted">${user.cuil || 'N/A'}</td>
             <td class="py-3 px-4 text-muted">${user.phone || 'N/A'}</td>
             <td class="py-3 px-4">
                 <span class="badge ${user.role === 'admin' ? 'bg-primary' : 'bg-info'} text-white">
@@ -113,18 +117,14 @@ function populateTable(users) {
                 </span>
             </td>
             <td class="py-3 px-4 text-center">
-                <span class="badge rounded-pill ${isInactive ? 'bg-danger' : 'bg-success'}">
-                    ${isInactive ? 'Inactivo' : 'Activo'}
+                <span class="badge rounded-pill ${isActive ? 'bg-success': 'bg-danger' }">
+                    ${isActive ? 'Activo' : 'Inactivo'}
                 </span>
             </td>
             <td class="py-3 px-4 text-center">
-                <a href="${EDIT_USER_BASE_URL}/${user.id}/edit" class="btn btn-sm btn-outline-info me-2 ${isInactive ? 'disabled' : ''}">
+                <a href="${EDIT_USER_BASE_URL}/${user.id}/edit" class="btn btn-sm btn-outline-info me-2 'opacity-100'">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/></svg>
                 </a>
-                <button type="button" class="btn btn-sm ${isInactive ? 'btn-success' : 'btn-danger'}" 
-                        onclick="prepareStatusModal(${user.id}, ${isInactive})">
-                    ${isInactive ? 'Activar' : 'Bajar'}
-                </button>
             </td>
         `;
         usersTableBody.appendChild(row);
@@ -241,6 +241,52 @@ function updatePagination(paginationData) {
     }
 }
 
+// Función para guardar (Alta o Edición)
+userForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(userForm);
+    const data = Object.fromEntries(formData);
+    const id = document.getElementById('userId').value;
+
+    // Si hay ID, es PUT (edición); si no, es POST (alta)
+    const url = id ? `/api/users/${id}` : '/api/users';
+    const method = id ? 'PUT' : 'POST';
+
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(id ? "Usuario actualizado" : "Usuario creado");
+            userModal.hide();
+            location.reload(); // Recarga simple para ver cambios
+        } else {
+            alert("Errores: " + Object.values(result.errors).flat().join('\n'));
+        }
+    } catch (error) {
+        console.error("Error en la petición:", error);
+    }
+});
+
+// Función para abrir el modal en modo EDICIÓN
+window.editUser = (user) => {
+    document.getElementById('userModalLabel').innerText = "Editar Usuario";
+    document.getElementById('userId').value = user.id;
+    document.getElementById('userFullName').value = user.full_name;
+    document.getElementById('userCuil').value = user.cuil;
+    document.getElementById('userEmail').value = user.email;
+    document.getElementById('userRole').value = user.role;
+    userModal.show();
+};
 // =====================================================================
 // 4. INICIALIZACIÓN
 // =====================================================================
