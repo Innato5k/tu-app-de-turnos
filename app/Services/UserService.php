@@ -3,15 +3,13 @@
 namespace App\Services;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use App\DTOs\User\UserRequestDTO;
-use App\DTOs\User\UserResponseDTO;
 use App\DTOs\User\UserUpdateRequestDTO;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserService
 {
@@ -22,16 +20,11 @@ class UserService
      *
      * @return \Illuminate\Database\Eloquent\Collection<User>
      */
-    public function getAllUsers(): LengthAwarePaginator
+    public function getAllUsers(Request $request, ?string $searchQuery = null, ?string $orderBy = null): LengthAwarePaginator
     {
+        $query = User::withTrashed()->orderBy($orderBy ?? 'name');
 
-
-        $query = User::query();
-
-        return $query->paginate(10);
-
-        //TODO: cuando tenga el Paginado, acomodar con los campos de User
-        /*if ($searchQuery) {
+        if ($searchQuery) {
             $query->where(function ($q) use ($searchQuery) {
                 $q->where('name', 'like', '%' . $searchQuery . '%')
                     ->orWhere('last_name', 'like', '%' . $searchQuery . '%')
@@ -39,12 +32,10 @@ class UserService
             });
         }
 
-        $perPage = $request->input('per_page', 10);
-        $page = $request->input('page', 1);*/
+        $perPage = $request->input('per_page', 5);
+        $page = $request->input('page', 1);
 
-        //return $query->paginate($perPage, ['*'], 'page', $page)->through(fn($patient) => PatientResponseDTO::fromModel($patient));
-
-
+        return $query->paginate($perPage, ['*'], 'page', $page);
     }
 
     /**
@@ -55,7 +46,7 @@ class UserService
      */
     public function findUserById(int $id): ?User
     {
-        return User::findOrFail($id);
+        return User::withTrashed()->findOrFail($id);
     }
 
     /**
@@ -69,7 +60,22 @@ class UserService
     {
         $user = $this->findUserById($id);
 
+        if (Auth::id() === $user->id && ($dto->role !== $user->roles->first()->name || isset($dto->is_active))) {
+            throw new \Exception("No puedes actualizar el estado o rol de tu propio usuario.");
+        }
         $user->update($dto->toArray());
+
+        if ($dto->role ) {
+            $user->syncRoles($dto->role);
+        }
+        if (isset($dto->is_active)) {
+            if ($dto->is_active) {
+                $user->restore();
+            } else {
+                $user->delete();
+            }
+        }
+
 
         return $user;
     }
@@ -95,7 +101,8 @@ class UserService
             'national_md_lic'    => $dto->national_md_lic,
             'provincial_md_lic'  => $dto->provincial_md_lic,
             'speciality'         => $dto->speciality,
-            'is_active'          => $dto->is_active,
+            'birth_date'         => $dto->birth_date,
+            'gender'             => $dto->gender,
         ]);
 
         $user->assignRole('professional');

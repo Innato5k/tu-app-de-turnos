@@ -17,12 +17,15 @@ readonly class UserUpdateRequestDTO
         public ?int $provincial_md_lic = null,
         public ?String $speciality = null,
         public ?bool $is_active = null,
+        public ?string $birth_date = null,
+        public ?string $gender = null,
+        public ?string $role = null,
     ) {}
 
-    public static function fromRequest(UpdateUserRequest $validated): self
+    public static function fromRequest(array $validated): self
     {
         return new self(
-             name: $validated['name'],
+            name: $validated['name'],
             last_name: $validated['last_name'],
             cuil: $validated['cuil'],
             email: $validated['email'],
@@ -32,6 +35,11 @@ readonly class UserUpdateRequestDTO
             provincial_md_lic: $validated['provincial_md_lic'] ?? null,
             speciality: $validated['speciality'] ?? null,
             is_active: (bool) ($validated['is_active'] ?? true),
+            birth_date: isset($validated['birth_date'])
+                ? \Carbon\Carbon::parse($validated['birth_date'])->format('Y-m-d')
+                : null,
+            gender: $validated['gender'] ?? null,          
+            role: $validated['role'] ?? null,  
         );
     }
 

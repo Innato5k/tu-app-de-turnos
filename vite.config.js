@@ -18,4 +18,13 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: { // <--- AGREGÁ ESTE BLOQUE
+        hmr: {
+            host: 'localhost',
+        },
+        watch: {
+            usePolling: true, // Crucial si trabajás en Windows con WSL2 o Docker
+            ignored: ['**/node_modules/**', '**/vendor/**'],
+        },
+    },
 });

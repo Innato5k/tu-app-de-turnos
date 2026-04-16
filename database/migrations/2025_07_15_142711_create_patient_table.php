@@ -6,36 +6,50 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('patients', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('last_name');
-            $table->string('email')->unique();
-            $table->string('cuil')->unique();     
-            $table->string('phone')->nullable();
-            $table->string('phone_opt')->nullable();
-            $table->string('observations')->nullable();
-            $table->date('birth_date')->nullable();
-            $table->string('gender')->nullable();
-            $table->string('address')->nullable();
-            $table->string('city')->nullable();
-            $table->string('province')->nullable();
-            $table->string('postal_code')->nullable();
-            $table->string('medical_coverage')->nullable();
-            $table->timestamps();
+        Schema::create('patients', function (Blueprint $blueprint) {
+            $blueprint->id();
+            
+            // Identificación
+            $blueprint->string('name');
+            $blueprint->string('last_name');
+            $blueprint->string('cuil', 20)->nullable()->unique();
+            $blueprint->date('birth_date')->nullable();
+            $blueprint->string('gender', 20)->nullable();
+            
+            // La HC que dejamos preparada para el futuro
+            $blueprint->string('medical_history')->nullable()->unique();
+            
+            // Contacto
+            $blueprint->string('email')->nullable();
+            $blueprint->string('phone', 50)->nullable();
+            $blueprint->string('phone_opt', 50)->nullable();
+            
+            // Ubicación
+            $blueprint->string('address')->nullable();
+            $blueprint->string('city')->nullable();
+            $blueprint->string('province')->nullable();
+            $blueprint->string('postal_code', 15)->nullable();
+            
+            // Datos Médicos (Strings por ahora)
+            $blueprint->string('medical_coverage')->nullable(); // Obra Social
+            $blueprint->string('affiliate_number')->nullable(); // Nro de Afiliado
+            $blueprint->string('preferred_modality')->nullable(); // Presencial / Virtual
+            $blueprint->text('observations')->nullable();
+            
+            // Multi-tenancy (Campos simples para futura expansión)
+            $blueprint->unsignedBigInteger('institution_id')->nullable()->index();
+            $blueprint->unsignedBigInteger('created_by_id')->nullable()->index();
+
+            // Auditoría nativa de Laravel
+            $blueprint->timestamps();
+            $blueprint->softDeletes(); // Habilita deleted_at
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('pacientes');
+        Schema::dropIfExists('patients');
     }
 };

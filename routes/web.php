@@ -20,6 +20,25 @@ Route::get('/dashboard', function () {
 
 // web.php
 
+Route::prefix('users')->group(function () {
+
+    // GET /users
+    Route::get('/', function () {
+        return view('users.index');
+    })->name('users.index');
+
+    // GET /users/create
+    Route::get('/create', function () {
+        return view('users.create');
+    })->name('users.create');
+
+    // GET /users/{id}/edit
+    Route::get('/{id}/edit', function ($id) {
+        return view('users.edit', ['id' => $id]);
+    })->name('users.edit');
+
+});
+
 Route::prefix('patients')->group(function () {
 
     // GET /patients

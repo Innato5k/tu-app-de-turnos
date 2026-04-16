@@ -8,6 +8,7 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\DTOs\User\UserUpdateRequestDTO;
 use App\DTOs\User\UserRequestDTO;
 use App\Http\Resources\User\UserResource;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -30,9 +31,14 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = $this->userService->getAllUsers();
+        $searchQuery = $request->query('search');
+        $perPage = $request->query('per_page', 10);
+        $page = $request->query('page', 1);
+
+        $users = $this->userService->getAllUsers($request, $searchQuery, 'name');
+        //return response()->json($users);
         return UserResource::collection($users);
     }
 
@@ -58,7 +64,7 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        $dto = UserRequestDTO::fromRequest($request);
+        $dto = UserRequestDTO::fromRequest($request->validated());         
         $user = $this->userService->registerUser($dto);
         return new UserResource($user);
     }
@@ -74,7 +80,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, int $id)
     {
         try {
-            $dto = UserUpdateRequestDTO::fromRequest($request);
+            $dto = UserUpdateRequestDTO::fromRequest($request->validated());     
             $user = $this->userService->updateUser($id, $dto);
             return new UserResource($user);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -92,7 +98,7 @@ class UserController extends Controller
     public function destroy(int $id)
     {
         try {
-            if( !$this->userService->deleteUser($id) ) {
+            if (!$this->userService->deleteUser($id)) {
                 return response()->json(['message' => 'Cannot delete yourself'], 403);
             }
             return response()->json(['message' => 'User deleted successfully'], 200);

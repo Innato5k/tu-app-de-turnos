@@ -102,6 +102,7 @@ async function fetchPatients(page = 1, searchQuery = '') {
         }
 
         const data = await response.json();
+        console.log('Datos recibidos de la API:', data); 
         populateTable(data.data); // Asume que la respuesta de la API tiene los datos en 'data.data'
         updatePagination(data); // Actualiza los controles de paginación
     } catch (error) {
@@ -122,6 +123,7 @@ async function fetchPatients(page = 1, searchQuery = '') {
  */
 function populateTable(patients) {
     patientsTableBody.innerHTML = ''; // Limpia las filas existentes
+    
 
     if (!Array.isArray(patients) || patients.length === 0) {
         patientsTableBody.innerHTML = `
@@ -136,7 +138,7 @@ function populateTable(patients) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td class="py-3 px-4 text-muted">${patient.id || ''}</td>
-            <td class="py-3 px-4 text-dark">${patient.name || ''}</td>
+            <td class="py-3 px-4 text-dark">${patient.full_name || ''}</td>
             <td class="py-3 px-4 text-muted">${patient.email || ''}</td>
             <td class="py-3 px-4 text-muted">${patient.phone || ''}</td>
             <td class="py-3 px-4 text-center">

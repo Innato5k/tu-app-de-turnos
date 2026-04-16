@@ -39,6 +39,9 @@
                             <a id="linkInicio" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/dashboard">Inicio</a>
                         </li>
                         <li class="nav-item">
+                            <a id="linkUsuarios" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/users">Usuarios</a>
+                        </li>
+                        <li class="nav-item">
                             <a id="linkMisTurnos" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/schedules">Calendario de Turnos</a>
                         </li>
                         <li class="nav-item">
@@ -53,6 +56,7 @@
                     </ul>
                     <!-- Parte derecha: Usuario y opciones de logout (visible en pantallas grandes) -->
                     <div class="d-flex align-items-center">
+                        
                         {{-- Elementos que se mostrarán/ocultarán con JS --}}
                         <span id="userNameDisplay" class="text-dark fw-medium me-2 d-none d-md-block small"></span>
                         <button id="logoutButton" class="btn btn-danger btn-sm fw-semibold py-1 px-3 d-none">
@@ -63,8 +67,6 @@
                         </a>
                     </div>
                 </div>
-
-
             </div>
         </nav>
 

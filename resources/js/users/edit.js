@@ -1,37 +1,31 @@
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Obtener el ID del paciente de la URL
-    // Asume que la URL es algo como /patients/{id}/edit
+    // Obtener el ID del usuario de la URL
+    // Asume que la URL es algo como /users/{id}/edit
     const pathSegments = window.location.pathname.split('/');
-    const patientId = pathSegments[pathSegments.length - 2]; 
+    const userId = pathSegments[pathSegments.length - 2];
 
     // URLs de la API
-    const API_PATIENTS_BASE_URL = '/api/patients'; // Base para GET y PUT
+    const API_userS_BASE_URL = '/api/users'; // Base para GET y PUT
     const REDIRECT_LOGIN_URL = '/login'; // Ruta de login para redireccionar en caso de token inválido
-    const REDIRECT_PATIENTS_LIST_URL = '/patients'; // Ruta para volver al listado después de guardar
+    const REDIRECT_userS_LIST_URL = '/users'; // Ruta para volver al listado después de guardar
 
     // Elementos del DOM
-    const editPatientForm = document.getElementById('editPatientForm');
-    const patientIdInput = document.getElementById('patientId');
+    const createuserForm = document.getElementById('createuserForm');
+    const userIdInput = document.getElementById('userId');
     const nameInput = document.getElementById('name');
     const lastNameInput = document.getElementById('last_name');
     const cuilInput = document.getElementById('cuil');
+    const birthDateInput = document.getElementById('birth_date');
+    const genderInput = document.getElementById('gender');
     const emailInput = document.getElementById('email');
     const phoneInput = document.getElementById('phone');
     const phoneOptInput = document.getElementById('phone_opt');
-    const observationsInput = document.getElementById('observations');
-    const birthDateInput = document.getElementById('birth_date');
-    const genderInput = document.getElementById('gender');
-    const addressInput = document.getElementById('address');
-    const cityInput = document.getElementById('city');
-    const provinceInput = document.getElementById('province');
-    const postalCodeInput = document.getElementById('postal_code');
-    const medicalCoverageInput = document.getElementById('medical_coverage');
-    const preferredModalityInput = document.getElementById('preferred_modality');
-    const savePatientButton = document.getElementById('savePatientButton');
-    const patientMessage = document.getElementById('patientMessage');
-    const isActiveInput = document.getElementById('is_active');
-    const ageInput = document.getElementById('age');
+    const nationalMdLicInput = document.getElementById('national_md_lic');
+    const provincialMdLicInput = document.getElementById('provincial_md_lic');
+    const specialityInput = document.getElementById('speciality');
+    const is_activeInput = document.getElementById('is_active');
+    const roleInput = document.getElementById('role');
 
     // Función para obtener el token JWT del localStorage
     function getAuthToken() {
@@ -40,9 +34,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Función para mostrar mensajes al usuario
     function showMessage(message, type = 'info') {
-        patientMessage.textContent = message;
-        patientMessage.classList.remove('text-success', 'text-danger', 'text-info');
-        patientMessage.classList.add(`text-${type}`);
+        userMessage.textContent = message;
+        userMessage.classList.remove('text-success', 'text-danger', 'text-info');
+        userMessage.classList.add(`text-${type}`);
     }
 
     // Función para formatear el CUIL (XX-XXXXXXXX-X)
@@ -76,8 +70,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         e.target.setSelectionRange(cursorPosition + lengthDifference, cursorPosition + lengthDifference);
     });
 
-    // Función para cargar los datos del paciente
-    async function loadPatientData() {
+    // Función para cargar los datos del usuario
+    async function loaduserData() {
         const token = getAuthToken();
         if (!token) {
             alert('No autenticado. Por favor, inicia sesión.'); // Reemplazar con modal personalizado
@@ -86,11 +80,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
 
-        showMessage('Cargando datos del paciente...', 'info');
-        savePatientButton.disabled = true;
+        showMessage('Cargando datos del usuario...', 'info');
+        saveuserButton.disabled = true;
 
         try {
-            const response = await fetch(`${API_PATIENTS_BASE_URL}/${patientId}`, {
+            const response = await fetch(`${API_userS_BASE_URL}/${userId}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -99,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (response.status === 401 || response.status === 403) {
-                alert('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.'); // Reemplazar con modal personalizado
+                alert('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.'); //TODO: Reemplazar con modal personalizado
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('token_type');
                 localStorage.removeItem('user_info');
@@ -109,39 +103,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Error al cargar los datos del paciente.');
+                throw new Error(errorData.message || 'Error al cargar los datos del usuario.');
             }
 
-            const patient = await response.json();
+            const user = await response.json();
 
-            // Llenar el formulario con los datos del paciente
-            patientIdInput.value = patient.data.id;
-            nameInput.value = patient.data.name || '';
-            lastNameInput.value = patient.data.last_name || '';
-            cuilInput.value = patient.data.cuil ? formatCuil(patient.data.cuil) : '';
-            emailInput.value = patient.data.email || '';
-            phoneInput.value = patient.data.phone || '';
-            phoneOptInput.value = patient.data.phone_opt || '';
-            observationsInput.value = patient.data.observations || '';
-            birthDateInput.value = patient.data.birth_date ? new Date(patient.data.birth_date).toISOString().split('T')[0] : '';
-            genderInput.value = patient.data.gender || '';
-            addressInput.value = patient.data.address || '';
-            cityInput.value = patient.data.city || '';
-            provinceInput.value = patient.data.province || '';
-            postalCodeInput.value = patient.data.postal_code || '';
-            medicalCoverageInput.value = patient.data.medical_coverage || '';
-            preferredModalityInput.value = patient.data.preferred_modality || '';
-            isActiveInput.checked = patient.data.is_active;   
-            ageInput.value = calculateAge(birthDateInput.value) || '';        
-
+            // Llenar el formulario con los datos del usuario
+            userIdInput.value = user.data.id;
+            nameInput.value = user.data.name || '';
+            lastNameInput.value = user.data.last_name || '';
+            cuilInput.value = user.data.cuil ? formatCuil(user.data.cuil) : '';
+            emailInput.value = user.data.email || '';
+            phoneInput.value = user.data.phone || '';
+            phoneOptInput.value = user.data.phone_opt || '';
+            birthDateInput.value = user.data.birth_date ? new Date(user.data.birth_date).toISOString().split('T')[0] : '';
+            genderInput.value = user.data.gender || '';
+            nationalMdLicInput.value = user.data.national_md_lic || '';
+            provincialMdLicInput.value = user.data.provincial_md_lic || '';
+            specialityInput.value = user.data.speciality || '';
+            is_activeInput.checked = (user.data.is_active);   
+            roleInput.value = user.data.role || '';
 
             showMessage(''); // Limpiar mensaje de carga
-            savePatientButton.disabled = false;
+            saveuserButton.disabled = false;
 
         } catch (error) {
-            console.error('Error al cargar paciente:', error);
+            console.error('Error al cargar usuario:', error);
             showMessage(`Error: ${error.message}`, 'danger');
-            savePatientButton.disabled = true; // Mantener deshabilitado si no se pudieron cargar los datos
+            saveuserButton.disabled = true; // Mantener deshabilitado si no se pudieron cargar los datos
         }
     }
 
@@ -157,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Manejador de envío del formulario de edición
-    editPatientForm.addEventListener('submit', async (e) => {
+    edituserForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const token = getAuthToken();
@@ -171,46 +160,43 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const fechNac = new Date(birthDateInput.value).toISOString().split('T')[0]
-        if ( fechNac > new Date().toISOString().split('T')[0]) {
+        if (fechNac > new Date().toISOString().split('T')[0]) {
             showMessage('La fecha de nacimiento no puede ser futura.', 'danger');
             return;
         }
 
-        savePatientButton.disabled = true;
-        savePatientButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
+        saveuserButton.disabled = true;
+        saveuserButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Guardando...';
         showMessage('', 'info'); // Limpiar mensajes anteriores
 
         // Nuevo: Limpiar el CUIL antes de enviarlo al backend (quitar guiones)
         const cleanCuil = cuilInput.value.replace(/\D/g, '');
 
-        const updatedPatientData = {
+        const updateduserData = {
             name: nameInput.value,
             last_name: lastNameInput.value,
             cuil: cleanCuil,
             email: emailInput.value,
             phone: phoneInput.value,
             phone_opt: phoneOptInput.value,
-            observations: observationsInput.value,
             birth_date: birthDateInput.value ? new Date(birthDateInput.value).toISOString() : null,
             gender: genderInput.value,
-            address: addressInput.value,
-            city: cityInput.value,
-            province: provinceInput.value,
-            postal_code: postalCodeInput.value,
-            medical_coverage: medicalCoverageInput.value,
-            preferred_modality: preferredModalityInput.value,
-            is_active: isActiveInput.checked, 
+            national_md_lic: nationalMdLicInput.value,
+            provincial_md_lic: provincialMdLicInput.value,
+            speciality: specialityInput.value,
+            is_active: is_activeInput.checked,
+            role: roleInput.value
         };
 
         try {
-            const response = await fetch(`${API_PATIENTS_BASE_URL}/${patientId}`, {
+            const response = await fetch(`${API_userS_BASE_URL}/${userId}`, {
                 method: 'PUT', // Usar PUT para actualización
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify(updatedPatientData)
+                body: JSON.stringify(updateduserData)
             });
 
             if (response.status === 401 || response.status === 403) {
@@ -227,27 +213,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error(errorData.message || 'Error al guardar los cambios.');
             }
 
-            // Si la respuesta es 200 OK (sin contenido) o devuelve el paciente actualizado
-            showMessage('Paciente actualizado exitosamente.', 'success');
-            // Opcional: Recargar los datos del paciente o redirigir
-            setTimeout(() => {
-                window.location.href = REDIRECT_PATIENTS_LIST_URL; // Redirige al listado
-            }, 1500);
+            // Si la respuesta es 200 OK (sin contenido) o devuelve el usuario actualizado
+            showMessage('usuario actualizado exitosamente.', 'success');
 
         } catch (error) {
-            console.error('Error al guardar paciente:', error);
+            console.error('Error al guardar usuario:', error);
             showMessage(`Error: ${error.message}`, 'danger');
         } finally {
-            savePatientButton.disabled = false;
-            savePatientButton.textContent = 'Guardar Cambios';
+            saveuserButton.disabled = false;
+            saveuserButton.textContent = 'Guardar Cambios';
         }
     });
 
-    // Cargar los datos del paciente al iniciar la página
-    if (patientId) {
-        loadPatientData();
+    // Cargar los datos del usuario al iniciar la página
+    if (userId) {
+        loaduserData();
     } else {
-        showMessage('Error: ID de paciente no encontrado en la URL.', 'danger');
-        savePatientButton.disabled = true;
+        showMessage('Error: ID de usuario no encontrado en la URL.', 'danger');
+        saveuserButton.disabled = true;
     }
 });

@@ -6,6 +6,7 @@ use App\Http\Requests\Patient\StorePatientRequest;
 use App\Http\Requests\Patient\UpdatePatientRequest;
 use App\DTOs\Patient\PatientRequestDTO;
 use App\DTOs\Patient\PatientUpdateRequestDTO;
+use App\Http\Resources\Patient\PatientResource;
 use Illuminate\Http\Request;
 use App\Services\PatientService;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -32,7 +33,7 @@ class PatientController extends Controller
         $page = $request->query('page', 1); 
         $patients = $this->patientService->getAllPatients($request , $searchQuery, $orderBy = 'name');
 
-        return response()->json($patients);
+        return PatientResource::collection($patients);
     }
 
     public function listActivePatients()
@@ -40,43 +41,32 @@ class PatientController extends Controller
         //TODO: chequear si funciona o no.
         $patients = $this->patientService->getAllActivePatients();
 
-        return response()->json($patients);
+        return PatientResource::collection($patients);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePatientRequest $request): JsonResponse
+    public function store(StorePatientRequest $request)
     {
         $dto = PatientRequestDTO::fromRequest($request->validated());
         $patient = $this->patientService->registerPatient($dto);
-        return response()->json([
-            'message' => 'Patient registered successfully',
-            'patient' => $patient
-        ], 201);
+        return new PatientResource($patient);
     }
 
     /**
      * Display the specified resource.
      */
     public function show(string $id)
-    {        
-        $id = (int)$id; 
-        $patient = $this->patientService->findPatientById($id);
-
-        if (!$patient) {
-            return response()->json(['message' => 'Patient not found   '.$id], 404);
-        }
-
-        return response()->json($patient);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+    {  
+        try
+        {
+            $id = (int)$id; 
+            $patient = $this->patientService->findPatientById($id);
+            return new PatientResource($patient);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['message' => 'Patient not found'], 404);
+        } 
     }
 
     /**
@@ -86,10 +76,7 @@ class PatientController extends Controller
     {
         $dto = PatientUpdateRequestDTO::fromRequest($request->validated());
         $patient = $this->patientService->updatePatient($id, $dto);
-        return response()->json([
-            'message' => 'Patient updated successfully',
-            'patient' => $patient
-        ], 200);
+        return new PatientResource($patient);
     }
     
     /**
