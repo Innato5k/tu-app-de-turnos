@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\DTOs\Schedule\ScheduleRequestDTO;
 use App\Models\ProfessionalSchedule;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class ProfessionalScheduleService
 {
@@ -85,25 +87,18 @@ class ProfessionalScheduleService
         return $schedule;
     }
 
-    public function store(Request $request)
+    public function store(ScheduleRequestDTO $request)
     {
-        if (!auth()->check()) {
-            dd('Usuario no autenticado para esta API. Token ausente/inválido.');
-        }
-        $userID = auth()->user()->id;
-        $daysOfWeek = $request->input('days_of_week');
-       
+        $userID = $request->user_id ?? auth()->user()->id;
 
-        foreach ($daysOfWeek as $dayNumber) {
-
-
+        foreach ($request->days_of_week as $dayNumber) {
             if ($this->hasOverlap(
                 $userID,
                 (string)$dayNumber,
-                $request->input('start_time'),
-                $request->input('end_time'),
-                $request->input('start_date'),
-                $request->input('end_date')
+                $request->start_time,
+                $request->end_time,
+                $request->effective_start_date,
+                $request->effective_end_date
             )) {
                 throw ValidationException::withMessages([
                     'schedule' => ['The schedule overlaps with an existing one.'],
@@ -112,13 +107,29 @@ class ProfessionalScheduleService
 
             ProfessionalSchedule::create([
                 'user_id' => $userID,
-                'start_time' => $request->input('start_time'),
-                'end_time' => $request->input('end_time'),
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
                 'day_of_week' => (string)$dayNumber,
-                'effective_start_date' => $request->input('start_date') ?? null,
-                'effective_end_date' => $request->input('end_date') ?? null,
+                'effective_start_date' => $request->effective_start_date ?? null,
+                'effective_end_date' => $request->effective_end_date ?? null,
+                'slot_duration' => $request->slot_duration ?? null,
+                'observations' => $request->observations ?? null,
             ]);
         }
+    }
+
+    public function delete(int $id): void
+    {
+        //TODO: cuando este listo los turnos, considerar si es necesario validar que no existan turnos asociados al horario antes de eliminarlo, o si se deben eliminar en cascada.
+        $schedule = $this->findScheduleById($id);
+
+        if (!$schedule) {
+            throw ValidationException::withMessages([
+                'schedule' => ['Schedule not found.'],
+            ]);
+        }
+
+        $schedule->delete();
     }
 
     public function hasOverlap(

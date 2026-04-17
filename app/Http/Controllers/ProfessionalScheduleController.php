@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Schedule\StoreScheduleRequest;
 use Illuminate\Http\Request;
 use App\Services\ProfessionalScheduleService;
-use App\Models\ProfessionalSchedule;
-use Hamcrest\Arrays\IsArray;
+use App\DTOs\Schedule\ScheduleRequestDTO;
+use App\Http\Resources\Schedule\ScheduleResource;
 
 class ProfessionalScheduleController extends Controller
 {
@@ -27,77 +28,20 @@ class ProfessionalScheduleController extends Controller
     
         $schedules = $this->professionalScheduleService->getAllSchedules($request, 'day_of_week');
 
-        return response()->json($schedules);
+        return ScheduleResource::collection($schedules);
     }
 
-    public function create(array $data): ?ProfessionalSchedule
+    public function store(StoreScheduleRequest $request)
     {
-        return null;
-    }
-
-    public function store(Request $request)
-    {
-         $request->validate([
-            'days_of_week' => 'required|array',
-        ]);
-        $schedules = $this->professionalScheduleService->store( $request, 'start_time');
+        $dto = ScheduleRequestDTO::fromRequest($request->validated());
+        $schedules = $this->professionalScheduleService->store( $dto);
 
         return response()->json($schedules);
-    }
-
-    public function show(int $id)
-    {
-        $schedule = $this->professionalScheduleService->findScheduleById($id);
-
-        if (!$schedule) {
-            return response()->json(['message' => 'Schedule not found'], 404);
-        }
-
-        return response()->json($schedule);
-    }
-
-    public function showByUserId(int $id)
-    {
-        $schedule = $this->professionalScheduleService->findScheduleByUserId($id);
-
-        if (!$schedule) {
-            return response()->json(['message' => 'User Schedule not found'], 404);
-        }
-
-        return response()->json($schedule);
-    }
-
-    public function update(Request $request, int $id)
-    {
-        $request->validate([
-            'user_id' => 'sometimes|exists:users,id',
-            'start_time' => 'sometimes|date_format:H:i',
-            'end_time' => 'sometimes|date_format:H:i|after:start_time',
-            'day_of_week' => 'sometimes|integer|min:0|max:6',
-            'effective_start_date' => 'nullable|date',
-            'effective_end_date' => 'nullable|date|after_or_equal:effective_start_date',
-        ]);
-
-        $schedule = $this->professionalScheduleService->updateSchedule($id, $request);
-
-        if (!$schedule) {
-            return response()->json(['message' => 'Schedule not found'], 404);
-        }
-
-        return response()->json($schedule);
     }
 
     public function destroy(int $id)
     {
-        //TODO: pasar al service la logica de búsqueda y eliminación del horario
-        
-        $schedule = $this->professionalScheduleService->findScheduleById($id);
-
-        if (!$schedule) {
-            return response()->json(['message' => 'Schedule not found'], 404);
-        }
-
-        $schedule->delete();
+        $this->professionalScheduleService->delete($id);
 
         return response()->json(['message' => 'Schedule deleted successfully']);
     }

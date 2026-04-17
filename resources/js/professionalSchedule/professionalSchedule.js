@@ -4,7 +4,6 @@
 
 const API_PROFESSIONALSCHEDULES_URL = '/api/professionalSchedule'; // URL base de tu API para horarios de profesionales
 const REDIRECT_LOGIN_URL = '/login'; // Ruta a la página de inicio de sesión (web)
-//const EDIT_PATIENT_BASE_URL = '/patients'; // Base para la URL de edición (ej. /patients/1/edit)
 // Mapeo de valores de día (0-6) a nombres
 const dayNames = {
     0: 'Domingo',
@@ -29,7 +28,6 @@ const schedulesTableBody = document.getElementById('schedulesTableBody');
  * @returns {string|null} El token JWT o null si no existe.
  */
 function getAuthToken() {
-
     return localStorage.getItem('auth_token');// Para depuración, puedes eliminarlo en producción
 }
 
@@ -38,12 +36,11 @@ function getAuthToken() {
  * @param {string} message Mensaje a mostrar al usuario.
  */
 function redirectToLogin(message) {
-    alert(message); // Considera reemplazar esto con un modal personalizado para mejor UX
+    alert(message); //TODO: Considera reemplazar esto con un modal personalizado para mejor UX
     localStorage.removeItem('auth_token');
     localStorage.removeItem('token_type');
     localStorage.removeItem('user_info');
     window.location.href = REDIRECT_LOGIN_URL;
-    console.log('Redirigiendo a la página de inicio de sesión...');
 }
 
 // --- Cargar horarios existentes al iniciar la página ---
@@ -68,7 +65,7 @@ async function fetchAndDisplaySchedules() {
         });
 
         if (!response.ok) {
-            redirectToLogin('Sesión expirada o no autorizada. Por favor, inicia sesión de nuevo.');
+            redirectToLogin('Datos incorrectos.'); // TODO:  comodar el mensaje correcto
 
         }
         const schedules = await response.json();
@@ -80,7 +77,7 @@ async function fetchAndDisplaySchedules() {
             return;
         }
 
-        schedules.forEach(schedule => {
+        schedules.data.forEach(schedule => {
             const row = schedulesTableBody.insertRow();
             const daysText = dayNames[schedule.day_of_week] || 'Desconocido';
             const startDateTime = schedule.start_time;
@@ -95,7 +92,24 @@ async function fetchAndDisplaySchedules() {
                     <td>${effectiveStartDate}</td>
                     <td>${effectiveEndDate}</td>
                     <td>
-                        <button class="btn btn-info btn-sm delete-schedule text-white" data-id="${schedule.id}">
+                        <button class="btn btn-danger btn-sm delete-schedule" data-id="${schedule.id}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                            </svg>
+                        </button>
+                    </td>
+                `;
+            //TODO: Considera mejorar la presentación de las fechas y horas, por ejemplo usando una librería como date-fns o moment.js para formatear de manera consistente
+            //TODO: aplciar editar horarios
+            /*row.innerHTML = `
+                    <td>${daysText}</td>
+                    <td>${startDateTime.substring(0, 5)}</td>
+                    <td>${endDateTime.substring(0, 5)}</td>
+                    <td>${effectiveStartDate}</td>
+                    <td>${effectiveEndDate}</td>
+                    <td>
+                        <button class="btn btn-info btn-sm edit-schedule text-white" data-id="${schedule.id}">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
                                 <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
                             </svg>
@@ -107,7 +121,7 @@ async function fetchAndDisplaySchedules() {
                             </svg>
                         </button>
                     </td>
-                `;
+                `;*/
         });
         attachDeleteListeners(); // Volver a adjuntar listeners después de recargar la tabla
     } catch (error) {
@@ -149,29 +163,29 @@ scheduleForm.addEventListener('submit', async function (event) {
         .map(checkbox => parseInt(checkbox.value));
 
     if (selectedDays.length === 0) {
-        alert('Por favor, selecciona al menos un día de la semana.');
+        alert('Por favor, selecciona al menos un día de la semana.');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
         return;
     }
 
     const startTime = document.getElementById('startTime').value;
     const endTime = document.getElementById('endTime').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
+    const effective_start_date = document.getElementById('startDate').value;
+    const effective_end_date = document.getElementById('endDate').value;
 
     // Validación básica de horas
     if (startTime >= endTime) {
-        alert('La hora de inicio debe ser anterior a la hora de fin.');
+        alert('La hora de inicio debe ser anterior a la hora de fin.');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
         return;
     }
 
     // Validación básica de fechas si están habilitadas
     if (enableDateRangeCheckbox.checked) {
         if (!startDate || !endDate) {
-            alert('Por favor, ingresa ambas fechas para el rango.');
+            alert('Por favor, ingresa ambas fechas para el rango.');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
             return;
         }
         if (new Date(startDate) > new Date(endDate)) {
-            alert('La fecha de inicio debe ser anterior o igual a la fecha de fin.');
+            alert('La fecha de inicio debe ser anterior o igual a la fecha de fin.');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
             return;
         }
     }
@@ -180,10 +194,11 @@ scheduleForm.addEventListener('submit', async function (event) {
         days_of_week: selectedDays,
         start_time: startTime,
         end_time: endTime,
-        start_date: enableDateRangeCheckbox.checked ? startDate : null,
-        end_date: enableDateRangeCheckbox.checked ? endDate : null,
+        effective_start_date: enableDateRangeCheckbox.checked ? effective_start_date : null,
+        effective_end_date: enableDateRangeCheckbox.checked ? effective_end_date : null,
     };
 
+    console.log('Datos a enviar:', scheduleData); // Para depuración, puedes eliminarlo en producción
 
     try {
         const response = await fetch(`${API_PROFESSIONALSCHEDULES_URL}`, {
@@ -201,14 +216,14 @@ scheduleForm.addEventListener('submit', async function (event) {
             throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || ''}`);
         }
 
-        alert('Horario guardado con éxito!');
+        alert('Horario guardado con éxito!');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
         scheduleForm.reset(); // Limpiar formulario
         enableDateRangeCheckbox.checked = false; // Desmarcar rango de fechas
         dateRangeFields.classList.add('hidden'); // Ocultar campos de rango
         fetchAndDisplaySchedules(); // Recargar la tabla de horarios
     } catch (error) {
         console.error('Error al guardar horario:', error);
-        alert('Hubo un error al guardar el horario: ' + error.message);
+        alert('Hubo un error al guardar el horario: ' + error.message);//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
     }
 });
 
@@ -240,11 +255,11 @@ function attachDeleteListeners() {
                     throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || ''}`);
                 }
 
-                alert('Horario eliminado con éxito!');
+                alert('Horario eliminado con éxito!');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
                 fetchAndDisplaySchedules(); // Recargar la tabla
             } catch (error) {
                 console.error('Error al eliminar horario:', error);
-                alert('Hubo un error al eliminar el horario: ' + error.message);
+                alert('Hubo un error al eliminar el horario: ' + error.message);//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
             }
         };
     });
