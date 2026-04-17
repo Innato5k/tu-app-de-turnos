@@ -16,6 +16,8 @@ class ProfessionalSchedule extends Model
         'end_time',
         'effective_start_date',
         'effective_end_date',
+        'slot_duration',
+        'observations',
     ];
 
     /**
@@ -24,8 +26,8 @@ class ProfessionalSchedule extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'start_time' => 'datetime:H:i:s', 
-        'end_time' => 'datetime:H:i:s',   
+        'start_time' => 'string', 
+        'end_time' => 'string',   
         'effective_start_date' => 'date', 
         'effective_end_date' => 'date',  
     ];

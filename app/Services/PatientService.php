@@ -6,7 +6,7 @@ use App\Models\Patient;
 use App\DTOs\Patient\PatientRequestDTO;
 use App\DTOs\Patient\PatientUpdateRequestDTO;
 use App\DTOs\Patient\PatientResponseDTO;
-use App\DTOs\Patient\PatientFullResponseDTO;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
@@ -32,6 +32,7 @@ class PatientService
             'medical_coverage'   => $dto->medicalCoverage,
             'preferred_modality' => $dto->preferredModality,
             'is_active'          => $dto->isActive,
+            'created_by_id'      => Auth::id(),
         ]);
     }
 
@@ -42,7 +43,7 @@ class PatientService
      */
     public function getAllPatients(Request $request, ?string $searchQuery = null, ?string $orderBy = null): LengthAwarePaginator
     {
-        $query = Patient::withTrashed()->orderBy($orderBy ?? 'last_name');
+        $query = Patient::withTrashed()->where('created_by_id', Auth::id())->orderBy($orderBy ?? 'last_name');
 
         if ($searchQuery) {
             $query->where(function ($q) use ($searchQuery) {
@@ -59,7 +60,7 @@ class PatientService
 
     public function getAllActivePatients(): Collection
     {
-        return Patient::where('is_active', true)
+        return Patient::where('is_active', true)->where('created_by_id', Auth::id())
             ->get()
             ->map(fn($patient) => PatientResponseDTO::fromModel($patient));
     }
@@ -72,7 +73,7 @@ class PatientService
      */
     public function findPatientById(int $id): ?Patient
     {
-        return Patient::withTrashed()->findOrFail($id);
+        return Patient::withTrashed()->where('created_by_id', Auth::id())->findOrFail($id);
     }
 
     /**
