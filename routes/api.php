@@ -27,6 +27,7 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 // Rutas protegidas
+// Rutas protegidas para la autenticación y gestión de tokens
 Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' => 'auth'], function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::post('refresh', [AuthController::class, 'refresh']); 
@@ -45,7 +46,7 @@ Route::group(['middleware' => ['jwt.auth','role:admin'], 'prefix' => 'users'], f
 // Rutas protegidas para la gestión de Pacientes
 Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' => 'patients'], function () {
     Route::get('/', [PatientController::class, 'index']); 
-    Route::get('/listActivePatients', [PatientController::class, 'listActivePatients']); 
+    Route::get('/listActivePatients', [PatientController::class, 'listActivePatients'])->name('Patients.listActivePatients'); 
     Route::get('/{id}', [PatientController::class, 'show'])->name('Patients.show'); 
     Route::put('/{id}', [PatientController::class, 'update']); 
     Route::delete('/{id}', [PatientController::class, 'destroy']);

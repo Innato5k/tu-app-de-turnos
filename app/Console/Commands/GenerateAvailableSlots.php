@@ -28,59 +28,65 @@ class GenerateAvailableSlots extends Command
      */
     public function handle()
     {
-        
-        $schedules = ProfessionalSchedule::all();
+        // Traemos los horarios con su relación de usuario para evitar queries de más
+        $schedules = ProfessionalSchedule::with('user')->get();
+        $this->info("Iniciando generación de slots para " . $schedules->count() . " reglas de horario.");
 
         foreach ($schedules as $schedule) {
+            // Rango de generación: Desde hoy hasta 2 meses adelante (ajustable)
             $startDate = now()->startOfDay();
-            $endDate = now()->addMonths(2)->endOfDay();            
-            
+            $endDate = now()->addMonths(2)->endOfDay();
+
             $currentDate = $startDate->clone();
+
             while ($currentDate->lte($endDate)) {
+                // 1. Validar día de la semana
                 if ($currentDate->dayOfWeek == $schedule->day_of_week) {
-                    // horarios con fechas de inicio/fin
-                    if ($schedule->effective_start_date && $schedule->effective_end_date) {
-                        if ($currentDate->between($schedule->effective_start_date, $schedule->effective_end_date)) {
-                            $this->createAvailableSlots($currentDate->format('Y-m-d'), $schedule);
-                        }
-                    } else {
-                        // Si no tiene rango de fechas, es "siempre"
-                        $this->createAvailableSlots($currentDate->format('Y-m-d'), $schedule);
+
+                    // 2. Validar fechas de efectividad
+                    $isEffective = true;
+                    if ($schedule->effective_start_date && $currentDate->lt($schedule->effective_start_date)) $isEffective = false;
+                    if ($schedule->effective_end_date && $currentDate->gt($schedule->effective_end_date)) $isEffective = false;
+
+                    if ($isEffective) {
+                        $this->createAvailableSlots($currentDate, $schedule);
                     }
                 }
-                $currentDate->addDay();                
+                $currentDate->addDay();
             }
         }
+        $this->info("¡Slots generados exitosamente!");
     }
 
-    // crear el slot disponible
-    protected function createAvailableSlots($date, $schedule)
-    {  
-        $startAvailableSlotsTime = Carbon::parse( $date . ' ' . $schedule->start_time->format('H:i:s'));
-        $endAvailableSlotsTime = Carbon::parse( $date . ' ' . $schedule->end_time->format('H:i:s'));
-        
-        $existingAvailableSlots = AvailableSlot::where([
-            'user_id' => $schedule->user_id,
-            'start_time' => $startAvailableSlotsTime
-        ])->first();
+    protected function createAvailableSlots($currentDate, $schedule)
+    {
+        $dateStr = $currentDate->format('Y-m-d');
+        $startTime = Carbon::parse($dateStr . ' ' . $schedule->start_time);
+        $endTime = Carbon::parse($dateStr . ' ' . $schedule->end_time);
 
-        $auxStartTime = clone $startAvailableSlotsTime;
-        //fin de espacio disponible cada 30 minutos
-        $auxEndTime = clone $auxStartTime;
-        $auxEndTime = $auxEndTime->addMinutes(30);
-        
-        if (!$existingAvailableSlots) {
-            while ($auxEndTime <= $endAvailableSlotsTime) {                
-                AvailableSlot::create([
-                    'user_id' => $schedule->user_id,
+        // Usamos el slot_duration del profesional, o 30 por defecto si no está definido
+        $duration = $schedule->slot_duration ?? 30;
+
+        $auxStartTime = $startTime->clone();
+
+        while ($auxStartTime->clone()->addMinutes($duration) <= $endTime) {
+            $auxEndTime = $auxStartTime->clone()->addMinutes($duration);
+
+            // EVITAR MUGRE: Solo creamos si no existe un slot para ese profesional a esa hora
+            // Usamos firstOrCreate para mayor seguridad
+            AvailableSlot::firstOrCreate(
+                [
+                    'user_id'    => $schedule->user_id,
                     'start_time' => $auxStartTime,
-                    'end_time' => $auxEndTime,
-                    'status' => 'available',
-                    'capacity' => 1,
-                ]);
-                $auxStartTime = $auxStartTime->addMinutes(30);
-                $auxEndTime = $auxEndTime->addMinutes(30);
-            }
+                ],
+                [
+                    'end_time'   => $auxEndTime,
+                    'status'     => 'available',
+                    'capacity'   => 1
+                ]
+            );
+
+            $auxStartTime->addMinutes($duration);
         }
     }
 }

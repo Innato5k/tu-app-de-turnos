@@ -24,10 +24,8 @@ class ProfessionalScheduleController extends Controller
     }
 
     public function index(Request $request)
-    {
-    
+    {  
         $schedules = $this->professionalScheduleService->getAllSchedules($request, 'day_of_week');
-
         return ScheduleResource::collection($schedules);
     }
 
