@@ -1,5 +1,8 @@
-import './bootstrap';
-// Importa los estilos de Bootstrap Icons
+import './bootstrap'; // El que trae Laravel con Axios
+import * as bootstrap from 'bootstrap'; // Importamos la librería que instalaste con Sail
+window.bootstrap = bootstrap; // LA CLAVE: Lo hacemos global para pacientes.js e index.jsimport './bootstrap';
+import 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -64,4 +67,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Redirige a la página de login (o a la raíz si el login es la raíz)
         window.location.href = "/login";
     });
+});
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    document.body.classList.add('loaded');
 });

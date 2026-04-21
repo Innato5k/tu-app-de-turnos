@@ -1,3 +1,4 @@
+
 // =====================================================================
 // 1. CONFIGURACIÓN Y VARIABLES GLOBALES
 // =====================================================================
@@ -102,7 +103,7 @@ async function fetchPatients(page = 1, searchQuery = '') {
         }
 
         const data = await response.json();
-        console.log('Datos recibidos de la API:', data); 
+        console.log('Datos recibidos de la API:', data); // Debug: Ver la estructura de la respuesta
         populateTable(data.data); // Asume que la respuesta de la API tiene los datos en 'data.data'
         updatePagination(data); // Actualiza los controles de paginación
     } catch (error) {
@@ -178,14 +179,14 @@ function updatePagination(paginationData) {
     patientsPagination.innerHTML = ''; // Limpia la paginación existente
 
     // Ejemplo básico de paginación (ajusta según tu API)
-    const currentPage = paginationData.current_page;
-    const lastPage = paginationData.last_page;
+    const currentPage = paginationData.meta.current_page;
+    const lastPage = paginationData.meta.last_page;
 
     if (lastPage > 1) {
         // Botón "Anterior"
         const prevItem = document.createElement('li');
         prevItem.classList.add('page-item');
-        if (!paginationData.prev_page_url) {
+        if (!paginationData.links.prev) {
             prevItem.classList.add('disabled');
         }
         prevItem.innerHTML = `<a class="page-link" href="#" data-page="${currentPage - 1}">Anterior</a>`;
@@ -205,7 +206,7 @@ function updatePagination(paginationData) {
         // Botón "Siguiente"
         const nextItem = document.createElement('li');
         nextItem.classList.add('page-item');
-        if (!paginationData.next_page_url) {
+        if (!paginationData.links.next) {
             nextItem.classList.add('disabled');
         }
         nextItem.innerHTML = `<a class="page-link" href="#" data-page="${currentPage + 1}">Siguiente</a>`;

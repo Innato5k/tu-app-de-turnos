@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\AvailableSlot\AvailableSlotResource;
+use App\Http\Requests\Appointment\StoreAppointmentRequest;
 use App\Services\ProfessionalAppointmentsService;
+use App\Dtos\Appointment\AppointmentDTO;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,37 +19,21 @@ class ProfessionalAppointmentsController extends Controller
         $this->professionalAppointmentsService = $professionalAppointmentsService;
     }
 
-    public function book(Request $request)
+    public function book(StoreAppointmentRequest $request)
     {
-        //TODO: revisar si esto realmente esta funcionando. 
-        $request->validate([
-            'available_slot_id' => 'required|exists:available_slots,id',
-            'notes' => 'nullable|string|max:500',
-            'patient_id' => 'required|exists:patients,id',
-        ]);
+        $dto = AppointmentDTO::fromRequest($request);
+        $appointment = $this->professionalAppointmentsService->bookSlot($dto);
 
-        try {
-            $appointment = $this->professionalAppointmentsService->bookSlot(
-                $request->input('available_slot_id'),
-                $request->input('patient_id'),                
-                $request->all()
-            );
-
-            return response()->json([
-                'message' => 'Cita reservada con éxito.',
-                'appointment' => $appointment,
-            ], Response::HTTP_CREATED);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage(),
-            ], Response::HTTP_CONFLICT);
-        }
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'Turno reservado correctamente',
+            'data'    => $appointment
+        ], 201);
     }
 
     public function index(Request $request)
     {
         $appointments = $this->professionalAppointmentsService->getCalendarData($request);
-        return response()->json($appointments);
+        return AvailableSlotResource::collection($appointments);
     }
 }

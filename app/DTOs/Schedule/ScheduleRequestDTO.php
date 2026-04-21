@@ -27,7 +27,7 @@ use App\Http\Requests\User\StoreScheduleRequest;
             end_time: $request['end_time'],
             effective_start_date: $request['effective_start_date'] ?? null,
             effective_end_date: $request['effective_end_date'] ?? null,
-            slot_duration: $request['slot_duration'] ?? null,   
+            slot_duration: $request['slot_duration'] ?? 30 ,   
             observations: $request['observations'] ?? null,                    
         );
     }

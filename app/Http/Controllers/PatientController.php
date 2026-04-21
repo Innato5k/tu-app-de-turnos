@@ -36,10 +36,12 @@ class PatientController extends Controller
         return PatientResource::collection($patients);
     }
 
-    public function listActivePatients()
+    public function listActivePatients(Request $request)
     {
         //TODO: chequear si funciona o no.
-        $patients = $this->patientService->getAllActivePatients();
+        //dd($request->query());
+        $patients = $this->patientService->getAllPatients($request, $request->query('search'), $orderBy = 'name');
+
 
         return PatientResource::collection($patients);
     }

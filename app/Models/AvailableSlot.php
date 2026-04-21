@@ -15,7 +15,9 @@ class AvailableSlot extends Model
         'start_time',
         'end_time',
         'status', 
+        'capacity', 
         'capacity',
+        'notes'
     ];
 
     /**
@@ -39,6 +41,10 @@ class AvailableSlot extends Model
     {
         return $this->hasMany(Appointment::class, 'available_slot_id');
     }
+
+    public function appointment() {
+    return $this->hasOne(Appointment::class, 'available_slot_id');
+}
 
     
 }
