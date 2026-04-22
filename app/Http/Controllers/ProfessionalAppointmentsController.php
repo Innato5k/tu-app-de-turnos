@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AvailableSlot\AvailableSlotResource;
 use App\Http\Requests\Appointment\StoreAppointmentRequest;
 use App\Services\ProfessionalAppointmentsService;
-use App\Dtos\Appointment\AppointmentDTO;
+use App\DTOs\Appointment\AppointmentDTO;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 

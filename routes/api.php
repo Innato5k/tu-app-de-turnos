@@ -26,7 +26,7 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
 });
 
-// Rutas protegidas
+
 // Rutas protegidas para la autenticación y gestión de tokens
 Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' => 'auth'], function () {
     Route::post('logout', [AuthController::class, 'logout']);

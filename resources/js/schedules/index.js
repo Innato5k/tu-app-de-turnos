@@ -12,7 +12,8 @@ import esLocale from '@fullcalendar/core/locales/es'; // Importa el locale de es
 
 //TODO: armar BE para recibir pacientes activos '/api/patients/listActivePatients'
 const patientsApiUrl = '/api/patients/listActivePatients';
-var calendar
+
+let calendar
 var tomSelectInstance = null;
 // Arriba, con tus otras variables globales
 let reservationModalInstance = null;
@@ -48,6 +49,25 @@ document.addEventListener('DOMContentLoaded', function () {
         eventClassNames: 'fc-event-custom', // Clase CSS personalizada para eventos
         timeZone: 'America/Argentina/Buenos_Aires',
 
+        events: function(info, successCallback, failureCallback) {
+            const token = localStorage.getItem('auth_token');
+        
+            // FullCalendar nos da info.startStr e info.endStr automáticamente (ISO8601)
+            // Pero tu BE espera d/m/Y, así que formateamos:
+            const start = info.start.toLocaleDateString('es-AR'); // d-m-Y
+            const end = info.end.toLocaleDateString('es-AR');
+
+            fetch(`/api/professionalAppointments/?start_date=${start}&end_date=${end}`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+            .then(response => response.json())
+            .then(json => {
+                // El Resource de Laravel devuelve la data en json.data
+                successCallback(json.data); 
+            })
+            .catch(error => failureCallback(error));
+        },
+
         eventClick: function (info) {
             // El objeto 'info' contiene toda la información del evento clickeado
             handleSlotClick(info.event);
@@ -55,25 +75,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Opciones de estilo para Bootstrap 5
         themeSystem: 'bootstrap5',
-
-        datesSet: function (info) {
-            // 'info.start' y 'info.end' son los objetos de fecha para el rango de la vista actual
-            const startDate = info.start;
-            const endDate = info.end;
-
-            // FullCalendar.formatDate es útil para dar formato
-            const formattedStartDate = calendar.formatDate(startDate, {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            const formattedEndDate = calendar.formatDate(endDate, {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            fetchCalendarData(formattedStartDate, formattedEndDate);
-        },
 
         eventDidMount: function (info) {
             if (info.event.extendedProps.status === 'available') { // available
@@ -94,12 +95,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 info.el.classList.add('fc-event-extra');
             }
         },
+
+               
+        
         select: function (info) {
             alert('Has seleccionado desde ' + info.startStr + ' hasta ' + info.endStr);
         },
-        /*eventClick: function (info) {
-            alert('Has hecho clic en: ' + info.event.title + ' (ID: ' + info.event.id + ')');
-        }*/
     });
 
 
@@ -118,8 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
 //TODO: Corregir , esta ok para post pero no para put       
 function sendReservationRequest(payload) {
     const token = localStorage.getItem('auth_token');
-
-    fetch('/api/appointments', {
+    fetch('/api/professionalAppointments/book', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -136,8 +136,8 @@ function sendReservationRequest(payload) {
             return data;
         })
         .then(data => {
-            alert('Reserva exitosa');
-            // Cerramos el modal (usando la instancia de Bootstrap)
+            //alert('Reserva exitosa');                         
+            alert('Turno reservado con éxito');
             const modalElement = document.getElementById('reservationModal');
             const modal = bootstrap.Modal.getInstance(modalElement);
             modal.hide();
@@ -175,7 +175,8 @@ function handleSlotClick(event) {
 let loadedPatients = [];
 
 // 1. Escuchar cuando el usuario escribe en el buscador
-document.getElementById('patient_search').addEventListener('input', function(e) {
+
+document.getElementById('patient_search')?.addEventListener('input', function(e) {
     const query = e.target.value;
     const datalist = document.getElementById('patientsList');
     const hiddenInput = document.getElementById('patient_id');
@@ -258,7 +259,7 @@ function submitReservation() {
         return;
     }
 
-    sendReservationRequest(payload); // Tu función de fetch POST que ya tenés
+    sendReservationRequest(payload); 
 }
 //---------------------------------------------------------
 
@@ -285,7 +286,6 @@ function fetchCalendarData(startDate, endDate) {
         })
         .then(data => {
             const rawEvents = data.data;
-            console.log('Datos recibidos del backend:', rawEvents);
 
             // Aquí debes procesar los datos para FullCalendar
             // La API debe devolver un formato que FullCalendar entienda
