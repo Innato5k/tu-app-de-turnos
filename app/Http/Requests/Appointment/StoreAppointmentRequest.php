@@ -16,6 +16,7 @@ class StoreAppointmentRequest extends FormRequest
             'notes'             => 'nullable|string|max:500',
             'cost'              => 'nullable|numeric|min:0',
             'modality'          => 'required|in:presencial,virtual',
+            'duration'  => 'required|integer|min:1',
         ];
     }
 }

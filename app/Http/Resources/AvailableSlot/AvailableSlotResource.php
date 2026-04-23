@@ -9,21 +9,25 @@ class AvailableSlotResource extends JsonResource
 {
     public function toArray($request): array
     {
-        $title = 'Disponible';
-        if ($this->appointment && $this->appointment->patient) {
-            $title = $this->appointment->patient->name . ' ' . $this->appointment->patient->last_name;
-        }
+        // ¿Es un Turno o es un Slot?
+        $isAppointment = $this->resource instanceof \App\Models\Appointment;
 
         return [
             'id'    => $this->id,
-            'title' => $title,
+            // Si es turno, nombre del paciente. Si es slot, su estado (Disponible/Bloqueado)
+            'title' => $isAppointment
+                ? ($this->patient?->last_name.' '. $this->patient?->name ?? 'Turno Ocupado')
+                : ($this->status === 'available' ? 'Disponible' : 'Bloqueado'),
+
             'start' => $this->start_time->toIso8601String(),
             'end'   => $this->end_time->toIso8601String(),
-            'backgroundColor' => $this->status === 'booked' ? '#f87171' : '#34d399',
+
+            'backgroundColor' => $isAppointment ? '#28a745' : ($this->status === 'available' ? '#007bff' : '#6c757d'),
+
             'extendedProps' => [
-                'status'         => $this->status,
-                'appointment_id' => $this->appointment?->id,
-                'patient_id'     => $this->appointment?->patient_id,
+                'is_appointment' => $isAppointment,
+                'status' => $isAppointment ? 'booked' : $this->status,
+                'appointment_id' => $isAppointment ? $this->id : null,
             ],
         ];
     }

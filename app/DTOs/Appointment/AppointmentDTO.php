@@ -9,7 +9,8 @@ class AppointmentDTO
         public readonly int $patientId,
         public readonly ?string $notes,
         public readonly ?float $cost,
-        public readonly ?string $modality
+        public readonly ?string $modality,
+        public readonly int $duration
     ) {}
 
     public static function fromRequest($request): self
@@ -19,7 +20,8 @@ class AppointmentDTO
             patientId: (int) $request->validated('patient_id'),
             notes: $request->validated('notes'),
             cost: $request->validated('cost') ? (float) $request->validated('cost') : null,
-            modality: $request->validated('modality')
+            modality: $request->validated('modality'),
+            duration: (int) $request->validated('duration')
         );
     }
 }

@@ -8,7 +8,6 @@ use App\Http\Requests\Appointment\StoreAppointmentRequest;
 use App\Services\ProfessionalAppointmentsService;
 use App\DTOs\Appointment\AppointmentDTO;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class ProfessionalAppointmentsController extends Controller
 {

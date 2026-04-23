@@ -27,7 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutButton.classList.remove('d-none'); // Muestra el botón de logout
             loginLink.classList.add('d-none'); // Oculta el enlace de login
             linkInicio.classList.remove('d-none'); // Oculta el menú de navegación no autenticado
-            linkUsuarios.classList.remove('d-none');//TODO: ver de ocultar este link para profesionales
+            if (user.role === 'admin') { // TODO: revisar si esto es necesario o no, y si es así, ver de ocultar este link para profesionales   
+                linkUsuarios.classList.remove('d-none');//TODO: ver de ocultar este link para profesionales
+            }
             linkHoraiosProfesional.classList.remove('d-none');
             linkMisTurnos.classList.remove('d-none');
             linkPacientes.classList.remove('d-none');

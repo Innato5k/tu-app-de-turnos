@@ -35,6 +35,7 @@
                     <input type="hidden" id="slotIdInput" name="available_slot_id">
 
                     <p>Complete los detalles para la reserva:</p>
+                    <p class="text-muted">Fecha y hora seleccionada: <span id="selectedDateTime" class="fw-bold"></span></p>
 
                     <div class="mb-3">
                         <label for="patient_id" class="form-label fw-bold">Paciente</label>
@@ -63,6 +64,8 @@
                         <select class="form-select" id="duration" name="duration" required>
                             <option value="30">30 minutos</option>
                             <option value="60">1 hora</option>
+                            <option value="90">1 hora 30 minutos</option>
+                            <option value="120">2 horas</option>
                         </select>
                     </div>
 

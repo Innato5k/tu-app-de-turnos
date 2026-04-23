@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Pero tu BE espera d/m/Y, así que formateamos:
             const start = info.start.toLocaleDateString('es-AR'); // d-m-Y
             const end = info.end.toLocaleDateString('es-AR');
-
+            console.log(`Fetching events from ${start} to ${end}`);
             fetch(`/api/professionalAppointments/?start_date=${start}&end_date=${end}`, {
                 headers: { 'Authorization': 'Bearer ' + token }
             })
@@ -135,14 +135,11 @@ function sendReservationRequest(payload) {
             }
             return data;
         })
-        .then(data => {
-            //alert('Reserva exitosa');                         
+        .then(data => {                        
             alert('Turno reservado con éxito');
             const modalElement = document.getElementById('reservationModal');
             const modal = bootstrap.Modal.getInstance(modalElement);
             modal.hide();
-
-            // Refrescamos el calendario para que el slot cambie de color (verde -> rojo)
             calendar.refetchEvents();
         })
         .catch(error => {
@@ -157,13 +154,15 @@ function handleSlotClick(event) {
     const slotId = event.id;
     const appointmentId = event.extendedProps.appointment_id;
     const startTimeStr = event.startStr;
+    const dateStr = event.start.toLocaleDateString('es-AR'); // Formatear fecha a d/m/Y
 
-    const formattedTime = startTimeStr ? startTimeStr.slice(11, 16) : 'Hora desconocida';
+    const formattedTime = startTimeStr ? dateStr + ' -  ' + startTimeStr.slice(11, 16) : 'Hora desconocida';
 
     if (status === 'available') {
         console.log(`Slot disponible clicado. ID: ${slotId}, Hora: ${formattedTime}`);
         showReservationModal(slotId, formattedTime);
     } else if (status === 'booked' || status === 'paid') {
+        console.log(`Slot reservado clicado. ID: ${slotId}, ${appointmentId}, Hora: ${formattedTime}`);
         showReservationModal(slotId, formattedTime, appointmentId);
     } else {
         alert(`Este horario (${formattedTime}) está ${status} y no puede ser reservado.`);
@@ -214,6 +213,8 @@ document.getElementById('patient_search')?.addEventListener('input', function(e)
 
 function showReservationModal(slotId, formattedTime, appointmentId = null) {
     const modalElement = document.getElementById('reservationModal');
+
+    selectedDateTime.textContent = formattedTime; // Mostrar la hora seleccionada en el modal
     
     // 1. Limpiar instancia previa si existe
     if (tomSelectInstance) {
@@ -223,6 +224,7 @@ function showReservationModal(slotId, formattedTime, appointmentId = null) {
     // 2. Seteos básicos
     document.getElementById('slotIdInput').value = slotId;
 
+    
     // 3. Inicializar TomSelect
     tomSelectInstance = new TomSelect('#patient_id', {
         valueField: 'id',
@@ -252,6 +254,7 @@ function submitReservation() {
         modality: document.getElementById('modality').value,
         cost: document.getElementById('cost').value,
         notes: document.getElementById('notes').value,
+        duration: document.getElementById('duration').value,
     };
 
     if (!payload.patient_id) {

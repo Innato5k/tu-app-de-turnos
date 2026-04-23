@@ -96,7 +96,7 @@ class AuthController extends Controller
      */
     public function me()
     {
-        //TODO: Chequear si funciona o no, y si devuelve lo que quiero o no.
+        
         return response()->json($this->authService->getAuthenticatedUser());
     }
 }

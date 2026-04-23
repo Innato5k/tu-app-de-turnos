@@ -53,6 +53,12 @@ class Appointment extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function slots()
+{
+    
+    return $this->hasMany(AvailableSlot::class, 'appointment_id');
+}
+
     /**
      * Get the available slot that the appointment belongs to.
      */

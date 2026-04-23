@@ -36,21 +36,21 @@ body {
 
 /* 1. DISPONIBLE */
 .fc .fc-event.fc-event-available {
-    background-color: #d2f3e7 !important; 
-    border-color: #567c6e !important;   
+    background-color: #E3F2FD !important; 
+    border-color: #1976D2 !important;   
     color: #155724 !important;       
 }
 
 /* 2. AGENDADO */
 .fc .fc-event.fc-event-booked {
-    background-color: #72acc1 !important; 
-    border-color: #015f7e !important;    
+    background-color: #90e194 !important; 
+    border-color: #2E7D32 !important;    
     color: #015f7e !important;          /
 }
 
 /* 3. BLOQUEADO POR PROFESIONAL  */
 .fc .fc-event.fc-event-blocked {
-    background-color: #f8d7da !important; 
+    background-color: #2E7D32 !important; 
     border-color: #dc3545 !important;    
     color: #721c24 !important;           
     opacity: 0.8;                        
@@ -86,16 +86,16 @@ body {
 
 /* 7. CANCELADO  */
 .fc .fc-event.fc-event-canceled {
-    background-color: #FFDAB9 !important; 
-    border-color: #6f543d !important;    
+    background-color: #9E9E9E !important; 
+    border-color: #686565 !important;    
     color: #2f1c0d !important;           
     opacity: 0.6;                        
     text-decoration: line-through;      
 }
 /* 8. EXTRA  */
 .fc .fc-event.fc-event-extra {
-    background-color: #bb90d6 !important; 
-    border-color: #5c446b !important;    
+    background-color: #ae4fd7 !important; 
+    border-color: #7B1FA2 !important;    
     color: #2f143f !important;           
     font-weight: bold;                   
     box-shadow: 0 0 7px rgba(0, 0, 0, 0.4); 
