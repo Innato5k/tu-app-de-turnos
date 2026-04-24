@@ -10,13 +10,21 @@ import interactionPlugin from '@fullcalendar/interaction';
 import bootstrap5Plugin from '@fullcalendar/bootstrap5';
 import esLocale from '@fullcalendar/core/locales/es'; // Importa el locale de español
 
-//TODO: armar BE para recibir pacientes activos '/api/patients/listActivePatients'
-const patientsApiUrl = '/api/patients/listActivePatients';
 
+const REDIRECT_LOGIN_URL = '/login'; // Ruta a la página de inicio de sesión (web)
+const patientsApiUrl = '/api/patients/listActivePatients';
 let calendar
 var tomSelectInstance = null;
-// Arriba, con tus otras variables globales
 let reservationModalInstance = null;
+
+function redirectToLogin(message) {
+    alert(message); // Considera reemplazar esto con un modal personalizado para mejor UX
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('token_type');
+    localStorage.removeItem('user_info');
+    window.location.href = REDIRECT_LOGIN_URL;
+}
+
 
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -49,9 +57,13 @@ document.addEventListener('DOMContentLoaded', function () {
         eventClassNames: 'fc-event-custom', // Clase CSS personalizada para eventos
         timeZone: 'America/Argentina/Buenos_Aires',
 
-        events: function(info, successCallback, failureCallback) {
+        events: function (info, successCallback, failureCallback) {
             const token = localStorage.getItem('auth_token');
-        
+            if (!token) {
+                redirectToLogin('No autenticado. Por favor, inicia sesión.');
+                return;
+            }
+
             // FullCalendar nos da info.startStr e info.endStr automáticamente (ISO8601)
             // Pero tu BE espera d/m/Y, así que formateamos:
             const start = info.start.toLocaleDateString('es-AR'); // d-m-Y
@@ -60,12 +72,12 @@ document.addEventListener('DOMContentLoaded', function () {
             fetch(`/api/professionalAppointments/?start_date=${start}&end_date=${end}`, {
                 headers: { 'Authorization': 'Bearer ' + token }
             })
-            .then(response => response.json())
-            .then(json => {
-                // El Resource de Laravel devuelve la data en json.data
-                successCallback(json.data); 
-            })
-            .catch(error => failureCallback(error));
+                .then(response => response.json())
+                .then(json => {
+                    // El Resource de Laravel devuelve la data en json.data
+                    successCallback(json.data);
+                })
+                .catch(error => failureCallback(error));
         },
 
         eventClick: function (info) {
@@ -96,8 +108,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
 
-               
-        
+
+
         select: function (info) {
             alert('Has seleccionado desde ' + info.startStr + ' hasta ' + info.endStr);
         },
@@ -119,6 +131,11 @@ document.addEventListener('DOMContentLoaded', function () {
 //TODO: Corregir , esta ok para post pero no para put       
 function sendReservationRequest(payload) {
     const token = localStorage.getItem('auth_token');
+    if (!token) {
+
+        redirectToLogin('No autenticado. Por favor, inicia sesión.');
+        return;
+    }
     fetch('/api/professionalAppointments/book', {
         method: 'POST',
         headers: {
@@ -135,7 +152,7 @@ function sendReservationRequest(payload) {
             }
             return data;
         })
-        .then(data => {                        
+        .then(data => {
             alert('Turno reservado con éxito');
             const modalElement = document.getElementById('reservationModal');
             const modal = bootstrap.Modal.getInstance(modalElement);
@@ -173,72 +190,62 @@ function handleSlotClick(event) {
 // Variable para almacenar los pacientes cargados y comparar nombres con IDs
 let loadedPatients = [];
 
-// 1. Escuchar cuando el usuario escribe en el buscador
-
-document.getElementById('patient_search')?.addEventListener('input', function(e) {
-    const query = e.target.value;
-    const datalist = document.getElementById('patientsList');
-    const hiddenInput = document.getElementById('patient_id');
-
-    // Si el usuario seleccionó una opción del datalist
-    const selectedPatient = loadedPatients.find(p => p.full_name === query);
-    if (selectedPatient) {
-        hiddenInput.value = selectedPatient.id;
-        // Opcional: auto-completar costo y modalidad si vienen en el objeto
-        if(selectedPatient.modality) document.getElementById('modality').value = selectedPatient.modality;
-        if(selectedPatient.cost) document.getElementById('cost').value = selectedPatient.cost;
-        return;
-    }
-
-    // Si está escribiendo (mínimo 3 caracteres), buscamos en el BE
-    if (query.length >= 3) {
-        const token = localStorage.getItem('auth_token');
-        fetch(`/api/patients/listActivePatients?search=${encodeURIComponent(query)}`, {
-            headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' }
-        })
-        .then(response => response.json())
-        .then(res => {
-            const patients = res.data; // Entramos a .data por tu estructura de Resource
-            loadedPatients = patients; // Guardamos para la comparación
-            
-            datalist.innerHTML = ''; // Limpiamos opciones viejas
-            patients.forEach(patient => {
-                const option = document.createElement('option');
-                option.value = patient.full_name; // Lo que ve el usuario
-                datalist.appendChild(option);
-            });
-        });
-    }
-});
 
 function showReservationModal(slotId, formattedTime, appointmentId = null) {
     const modalElement = document.getElementById('reservationModal');
+    const selectedDateTime = document.getElementById('selectedDateTime');
+    selectedDateTime.textContent = formattedTime;
 
-    selectedDateTime.textContent = formattedTime; // Mostrar la hora seleccionada en el modal
-    
-    // 1. Limpiar instancia previa si existe
     if (tomSelectInstance) {
         tomSelectInstance.destroy();
     }
 
-    // 2. Seteos básicos
     document.getElementById('slotIdInput').value = slotId;
 
-    
-    // 3. Inicializar TomSelect
     tomSelectInstance = new TomSelect('#patient_id', {
         valueField: 'id',
         labelField: 'full_name',
         searchField: ['full_name', 'cuil'],
-        load: function(query, callback) {
+        placeholder: 'Escriba nombre o CUIL para buscar...',
+        allowEmptyOption: true,
+        persist: false,
+        load: function (query, callback) {
             if (!query.length) return callback();
             const token = localStorage.getItem('auth_token');
+            if (!token) {
+
+                redirectToLogin('No autenticado. Por favor, inicia sesión.');
+                return;
+            }
             fetch(`/api/patients/listActivePatients?search=${encodeURIComponent(query)}`, {
                 headers: { 'Authorization': 'Bearer ' + token }
             })
-            .then(response => response.json())
-            .then(json => callback(json.data))
-            .catch(() => callback());
+                .then(response => response.json())
+                .then(json => {
+                    loadedPatients = json.data;
+                    callback(json.data);
+                })
+                .catch(() => callback());
+        },
+        // AQUÍ HACEMOS LA MAGIA DEL AUTOCOMPLETADO
+        onChange: function (value) {
+            if (!value) return;
+
+            // Buscamos al paciente en la lista que acabamos de cargar en 'load'
+            const selectedPatient = loadedPatients.find(p => p.id == value);
+
+            if (selectedPatient) {
+                console.log("TomSelect seleccionó a:", selectedPatient);
+
+                // Autocompletar Modalidad
+                if (selectedPatient.preferred_modality) {
+                    document.getElementById('modality').value = selectedPatient.preferred_modality;
+                }
+                
+                if (selectedPatient.preferred_cost) {
+                    document.getElementById('cost').value = selectedPatient.preferred_cost;
+                } 
+            }
         }
     });
 
@@ -262,7 +269,7 @@ function submitReservation() {
         return;
     }
 
-    sendReservationRequest(payload); 
+    sendReservationRequest(payload);
 }
 //---------------------------------------------------------
 
@@ -270,8 +277,9 @@ function submitReservation() {
 function fetchCalendarData(startDate, endDate) {
     const apiUrl = `/api/professionalAppointments/?start_date=${startDate}&end_date=${endDate}`;
     const token = localStorage.getItem('auth_token');
-    if (!token) {
-        console.error("Token de autenticación no encontrado.");
+    if (!token) {        
+        redirectToLogin('No autenticado. Por favor, inicia sesión.');
+        return;
     }
 
     fetch(apiUrl, {

@@ -106,20 +106,30 @@
                     </div>
                 </div>
                 <div class="row d-flex justify-content-between allign-items-center">
-                    <div class="col mb-3 col-md-9">
-                        <label for="observations" class="form-label text-dark small ">Observaciones</label>
-                        <textarea id="observations" name="observations" class="form-control form-control-sm border-secondary" rows="3"></textarea>
+                    <div class="col mb-3 col-md-9 ">
+                        <label for="observations" class="form-label text-dark small  ">Observaciones</label>
+                        <textarea id="observations" name="observations" class="form-control form-control-sm border-secondary" rows="5"></textarea>
                     </div>
-                    <div class="col mb-3 col-md-3">
-                        <div class="row  mx-1">
-                            <label for="preferred_modality" class="form-label text-dark small">Modalidad Preferida</label>
-                            <select id="preferred_modality" name="preferred_modality" class="form-select form-select-sm border-secondary">
-                                <option value="" selected disabled>Seleccione una opción</option>
-                                <option value="Presencial">Presencial</option>
-                                <option value="Virtual">Virtual</option>
-                            </select>
+                    <div class=col mb-3 col-md-3">
+                        <div class="col mb-3 ">
+                            <div class="row  mx-1">
+                                <label for="preferred_modality" class="form-label text-dark small">Modalidad Preferida</label>
+                                <select id="preferred_modality" name="preferred_modality" class="form-select form-select-sm border-secondary">
+                                    <option value="" selected disabled>Seleccione una opción</option>
+                                    <option value="Presencial">Presencial</option>
+                                    <option value="Virtual">Virtual</option>
+                                </select>
+                            </div>
                         </div>
+                        <div class="col mb-3 ">
+                            <div class="row  mx-1">
+                                <label for="preferred_cost" class="form-label text-dark small">Costo Acordado</label>
+                                <input type="text" id="preferred_cost" name="preferred_cost" class="form-control form-control-sm border-secondary">
+                            </div>
+                        </div>
+
                     </div>
+
                 </div>
                 <div class="row d-flex justify-content-between mb-1">
                     <div class="col-md-6">

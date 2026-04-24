@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Obtener el ID del paciente de la URL
     // Asume que la URL es algo como /patients/{id}/edit
     const pathSegments = window.location.pathname.split('/');
-    const patientId = pathSegments[pathSegments.length - 2]; 
+    const patientId = pathSegments[pathSegments.length - 2];
 
     // URLs de la API
     const API_PATIENTS_BASE_URL = '/api/patients'; // Base para GET y PUT
@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const postalCodeInput = document.getElementById('postal_code');
     const medicalCoverageInput = document.getElementById('medical_coverage');
     const preferredModalityInput = document.getElementById('preferred_modality');
+    const preferredCostInput = document.getElementById('preferred_cost');
     const savePatientButton = document.getElementById('savePatientButton');
     const patientMessage = document.getElementById('patientMessage');
     const isActiveInput = document.getElementById('is_active');
@@ -131,8 +132,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             postalCodeInput.value = patient.data.postal_code || '';
             medicalCoverageInput.value = patient.data.medical_coverage || '';
             preferredModalityInput.value = patient.data.preferred_modality || '';
-            isActiveInput.checked = patient.data.is_active;   
-            ageInput.value = calculateAge(birthDateInput.value) || '';        
+            preferredCostInput.value = '$' + (patient.data.preferred_cost || '00.00');
+            isActiveInput.checked = patient.data.is_active;
+            ageInput.value = calculateAge(birthDateInput.value) || '';
 
 
             showMessage(''); // Limpiar mensaje de carga
@@ -171,7 +173,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const fechNac = new Date(birthDateInput.value).toISOString().split('T')[0]
-        if ( fechNac > new Date().toISOString().split('T')[0]) {
+        if (fechNac > new Date().toISOString().split('T')[0]) {
             showMessage('La fecha de nacimiento no puede ser futura.', 'danger');
             return;
         }
@@ -182,6 +184,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Nuevo: Limpiar el CUIL antes de enviarlo al backend (quitar guiones)
         const cleanCuil = cuilInput.value.replace(/\D/g, '');
+        const cleanCost = (value) => {
+            return value.replace(/[^\d.]/g, '');
+        };
 
         const updatedPatientData = {
             name: nameInput.value,
@@ -199,7 +204,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             postal_code: postalCodeInput.value,
             medical_coverage: medicalCoverageInput.value,
             preferred_modality: preferredModalityInput.value,
-            is_active: isActiveInput.checked, 
+            preferred_cost: parseFloat(cleanCost(preferredCostInput.value)),
+            is_active: isActiveInput.checked,
         };
 
         try {

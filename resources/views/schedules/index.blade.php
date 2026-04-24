@@ -39,7 +39,7 @@
 
                     <div class="mb-3">
                         <label for="patient_id" class="form-label fw-bold">Paciente</label>
-                        <select id="patient_id" name="patient_id" class="form-control" placeholder="Escriba nombre o CUIL para buscar..." required>
+                        <select id="patient_id" name="patient_id" class="form-control"  required>
                             <option value=""></option>
                         </select>
                         <div class="form-text">Mínimo 3 caracteres para buscar.</div>
@@ -49,14 +49,14 @@
                         <label for="modality" class="form-label">Modalidad</label>
                         <select class="form-select" id="modality" name="modality" required>
                             <option value="">Seleccione...</option>
-                            <option value="presencial">Presencial</option>
-                            <option value="virtual">Virtual</option>
+                            <option value="Presencial">Presencial</option>
+                            <option value="Virtual">Virtual</option>
                         </select>
                     </div>
 
                     <div class="mb-3">
                         <label for="cost" class="form-label">Costo ($)</label>
-                        <input type="number" class="form-control" id="cost" name="cost" required value="5000">
+                        <input type="number" class="form-control" id="cost" name="Cost" required value="5000">
                     </div>
 
                     <div class="mb-3">

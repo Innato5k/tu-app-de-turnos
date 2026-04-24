@@ -27,6 +27,7 @@ class Patient extends Model
         'medical_coverage',
         'affiliate_number',
         'preferred_modality',
+        'preferred_cost',
         'observations',
         'institution_id',
         'created_by_id',

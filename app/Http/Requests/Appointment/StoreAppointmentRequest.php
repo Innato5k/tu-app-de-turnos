@@ -15,7 +15,7 @@ class StoreAppointmentRequest extends FormRequest
             'patient_id'        => 'required|exists:patients,id',
             'notes'             => 'nullable|string|max:500',
             'cost'              => 'nullable|numeric|min:0',
-            'modality'          => 'required|in:presencial,virtual',
+            'modality'          => 'required|in:Presencial,Virtual',
             'duration'  => 'required|integer|min:1',
         ];
     }

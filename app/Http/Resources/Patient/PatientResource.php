@@ -33,10 +33,11 @@ class PatientResource extends JsonResource
             'affiliate_number' => $this->when($request->routeIs('Patients.show'), $this->affiliate_number),
 
             //datos adicionales     
-            'preferred_modality' => $this->when($request->routeIs('Patients.show'), $this->preferred_modality),
+            'preferred_modality' => $this->when($request->routeIs('Patients.show') || $request->routeIs('Patients.listActivePatients'), $this->preferred_modality),
             'observations' => $this->when($request->routeIs('Patients.show'), $this->observations),
             'is_active' => !$this->deleted_at,
             'medical_history' => $this->when($request->routeIs('Patients.show'), $this->medical_history),
+            'preferred_cost' => $this->when($request->routeIs('Patients.show') || $request->routeIs('Patients.listActivePatients'), $this->preferred_cost),
 
             // relaciones
             'institution_id' => $this->when($request->routeIs('Patients.show'), $this->institution_id),

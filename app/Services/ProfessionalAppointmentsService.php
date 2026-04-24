@@ -5,13 +5,13 @@ namespace App\Services;
 use App\Models\AvailableSlot;
 use App\Models\Appointment;
 use App\Services\PatientService;
+use App\Dtos\Appointment\AppointmentDTO;
+use App\DTOs\Patient\PatientUpdatePreferredRequestDTO;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
-use App\Dtos\Appointment\AppointmentDTO;
 use Illuminate\Http\Request;
 use Exception;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class ProfessionalAppointmentsService
 {
@@ -72,6 +72,13 @@ class ProfessionalAppointmentsService
                 'modality'          => $dto->modality ?? null,
             ]);
 
+            $this->patientService->updatePatientPreferred($dto->patientId, new PatientUpdatePreferredRequestDTO(
+                preferred_modality: $dto->modality,
+                preferred_cost: $dto->cost
+            ));
+
+            
+
             if (!$nextSlots->isEmpty()) {
                 foreach ($nextSlots as $slot) {
                     $slot->update([
@@ -80,9 +87,6 @@ class ProfessionalAppointmentsService
                     ]);
                 }
             }
-
-
-
 
             return $appointment;
         });
