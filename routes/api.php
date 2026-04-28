@@ -70,6 +70,7 @@ Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' =
     Route::put('/{id}', [ProfessionalAppointmentsController::class, 'update']); 
     Route::delete('/{id}', [ProfessionalAppointmentsController::class, 'destroy']);
     Route::post('/book', [ProfessionalAppointmentsController::class, 'book']);
+    Route::post('/bookExtra', [ProfessionalAppointmentsController::class, 'bookExtra']);
 });
 // Ejemplo de una ruta protegida adicional
 Route::middleware(['jwt.auth'])->get('/user-profile', function (Request $request) {

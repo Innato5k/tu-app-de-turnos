@@ -2,28 +2,26 @@
 
 namespace App\DTOs\Appointment;
 
-class AppointmentDTO
+class ExtraAppointmentDTO
 {
     public function __construct(
-        public readonly int $slotId,
-        public readonly int $patientId,
+        public readonly string $start_time,
+        public readonly int $patient_id,
         public readonly ?string $notes,
         public readonly ?float $cost,
         public readonly ?string $modality,
-        public readonly int $duration,
-        public readonly ?string $status
+        public readonly int $duration
     ) {}
 
     public static function fromRequest($request): self
     {
         return new self(
-            slotId: (int) $request->validated('available_slot_id'),
-            patientId: (int) $request->validated('patient_id'),
+            start_time: $request['start_time'] ?? null,
+            patient_id: (int) $request->validated('patient_id'),
             notes: $request->validated('notes'),
             cost: $request->validated('cost') ? (float) $request->validated('cost') : null,
             modality: $request->validated('modality'),
-            duration: (int) $request->validated('duration'),
-            status: $request->validated('notes')
+            duration: (int) $request->validated('duration')
         );
     }
 }
