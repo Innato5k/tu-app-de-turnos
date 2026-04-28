@@ -59,7 +59,7 @@ async function fetchPatients(page = 1, searchQuery = '') {
 
     if (!token) {
         
-        redirectToLogin('No autenticado. Por favor, inicia sesión.');
+        redirectToLogin('No autenticado. Por favor, inicia sesión.2');
         return;
     }
 

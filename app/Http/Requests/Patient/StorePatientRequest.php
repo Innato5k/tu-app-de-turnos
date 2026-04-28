@@ -26,6 +26,7 @@ class StorePatientRequest extends FormRequest
             'postal_code' => 'nullable|string|max:20',
             'medical_coverage' => 'nullable|string|max:255',
             'preferred_modality' => 'nullable|string|max:50',
+            'preferred_cost' => 'nullable|numeric|min:0',
         ];
     }
 }

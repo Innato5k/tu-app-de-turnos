@@ -6,10 +6,10 @@ use App\Http\Requests\Patient\StorePatientRequest;
 use App\Http\Requests\Patient\UpdatePatientRequest;
 use App\DTOs\Patient\PatientRequestDTO;
 use App\DTOs\Patient\PatientUpdateRequestDTO;
+use App\DTOs\Patient\PatientUpdatePreferredRequestDTO;
 use App\Http\Resources\Patient\PatientResource;
 use Illuminate\Http\Request;
 use App\Services\PatientService;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class PatientController extends Controller
 {
@@ -27,10 +27,7 @@ class PatientController extends Controller
 
     public function index(Request $request)
     {
-        //TODO: pasar los parámetros de búsqueda, ordenamiento y paginación a la capa de servicio
         $searchQuery = $request->query('search');
-        $perPage = $request->query('per_page', 10); 
-        $page = $request->query('page', 1); 
         $patients = $this->patientService->getAllPatients($request , $searchQuery, $orderBy = 'name');
 
         return PatientResource::collection($patients);
@@ -38,11 +35,7 @@ class PatientController extends Controller
 
     public function listActivePatients(Request $request)
     {
-        //TODO: chequear si funciona o no.
-        //dd($request->query());
         $patients = $this->patientService->getAllPatients($request, $request->query('search'), $orderBy = 'name');
-
-
         return PatientResource::collection($patients);
     }
 

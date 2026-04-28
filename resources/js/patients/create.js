@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const postalCodeInput = document.getElementById('postal_code');
     const medicalCoverageInput = document.getElementById('medical_coverage');
     const preferred_modality = document.getElementById('preferred_modality');
+    const preferred_cost = document.getElementById('preferred_cost');
     const savePatientButton = document.getElementById('savePatientButton');
     const patientMessage = document.getElementById('patientMessage');
     
@@ -112,9 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             postal_code: postalCodeInput.value,
             medical_coverage: medicalCoverageInput.value,
             preferred_modality: preferred_modality.value,
-            
-            
-            // Si hay otros campos, agrégalos aquí
+            preferred_cost: preferred_cost.value,
         };
 
         try {

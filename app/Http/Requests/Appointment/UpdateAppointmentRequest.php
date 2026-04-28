@@ -4,19 +4,18 @@ namespace App\Http\Requests\Appointment;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreAppointmentRequest extends FormRequest
+class UpdateAppointmentRequest extends FormRequest
 {
     public function authorize(): bool { return true; }
 
     public function rules(): array
     {
         return [
-            'available_slot_id' => 'required|exists:available_slots,id',
-            'patient_id'        => 'required|exists:patients,id',
+            'status'            => 'required|in:booked,attended,absent,cancelled',
+            'payment_status'    => 'required|in:paid,pending',
             'notes'             => 'nullable|string|max:500',
             'cost'              => 'nullable|numeric|min:0',
             'modality'          => 'required|in:Presencial,Virtual',
-            'duration'  => 'required|integer|min:1',
         ];
     }
 }

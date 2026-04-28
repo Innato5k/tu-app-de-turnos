@@ -5,7 +5,8 @@ namespace App\Services;
 use App\Models\Patient;
 use App\DTOs\Patient\PatientRequestDTO;
 use App\DTOs\Patient\PatientUpdateRequestDTO;
-use App\DTOs\Patient\PatientResponseDTO;
+use App\Http\Resources\Patient\PatientResource;
+use App\DTOs\Patient\PatientUpdatePreferredRequestDTO;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -31,6 +32,7 @@ class PatientService
             'postal_code'        => $dto->postalCode,
             'medical_coverage'   => $dto->medicalCoverage,
             'preferred_modality' => $dto->preferredModality,
+            'preferred_cost'     => $dto->preferredCost,
             'is_active'          => $dto->isActive,
             'created_by_id'      => Auth::id(),
         ]);
@@ -62,7 +64,7 @@ class PatientService
     {
         return Patient::where('is_active', true)->where('created_by_id', Auth::id())
             ->get()
-            ->map(fn($patient) => PatientResponseDTO::fromModel($patient));
+            ->map(fn($patient) => PatientResource::fromModel($patient));
     }
 
     /**
@@ -97,7 +99,13 @@ class PatientService
                 $patient->delete();
             }
         }
+        return $patient;
+    }
 
+    public function updatePatientPreferred(int $id, PatientUpdatePreferredRequestDTO $data): ?Patient
+    {
+        $patient = $this->findPatientById($id);
+        $patient->update($data->toArray());
         return $patient;
     }
 

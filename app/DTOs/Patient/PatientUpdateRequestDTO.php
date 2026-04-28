@@ -9,7 +9,7 @@ readonly class PatientUpdateRequestDTO
         public string $last_name,
         public string $cuil,
         public string $email,
-        public ?string $phone = null,
+        public ?string $phone,
         public ?string $phone_opt = null,
         public ?string $observations = null,
         public ?string $birth_date = null,
@@ -20,6 +20,7 @@ readonly class PatientUpdateRequestDTO
         public ?string $postal_code = null,
         public ?string $medical_coverage = null,
         public ?string $preferred_modality = null,
+        public ?float $preferred_cost = null,
         public ?bool $is_active = null,
     ) {}
 
@@ -43,6 +44,7 @@ readonly class PatientUpdateRequestDTO
             postal_code: $validated['postal_code'] ?? null,
             medical_coverage: $validated['medical_coverage'] ?? null,
             preferred_modality: $validated['preferred_modality'] ?? null,
+            preferred_cost: $validated['preferred_cost'] ?? null,
             is_active: (bool) ($validated['is_active'] ?? true),
         );
     }

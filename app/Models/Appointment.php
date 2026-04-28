@@ -12,6 +12,14 @@ use App\Models\User;
 class Appointment extends Model
 {
     use HasFactory ,  SoftDeletes;
+    const STATUS_SCHEDULED = 'booked';
+    const STATUS_ATTENDED  = 'attended';
+    const STATUS_ABSENT    = 'absent';
+    const STATUS_CANCELLED = 'cancelled'; //TODO:sacar doble ll para ocultar los cancelados
+
+    // Constantes de Pago
+    const PAYMENT_PENDING = 'pending';
+    const PAYMENT_PAID    = 'paid';
 
     protected $fillable = [
         'patient_id',
@@ -20,6 +28,8 @@ class Appointment extends Model
         'start_time',
         'end_time',
         'status',
+        'payment_status',
+        'is_extra',
         'title',
         'notes',
         'cost',
@@ -52,6 +62,12 @@ class Appointment extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function slots()
+{
+    
+    return $this->hasMany(AvailableSlot::class, 'appointment_id');
+}
 
     /**
      * Get the available slot that the appointment belongs to.

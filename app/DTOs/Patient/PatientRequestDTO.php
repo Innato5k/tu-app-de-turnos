@@ -20,6 +20,7 @@ readonly class PatientRequestDTO
         public ?string $postalCode = null,
         public ?string $medicalCoverage = null,
         public ?string $preferredModality = null,
+        public ?float $preferredCost = null,
         public bool $isActive = true,
     ) {}
 
@@ -43,6 +44,7 @@ readonly class PatientRequestDTO
             postalCode: $validated['postal_code'] ?? null,
             medicalCoverage: $validated['medical_coverage'] ?? null,
             preferredModality: $validated['preferred_modality'] ?? null,
+            preferredCost: isset($validated['preferred_cost']) ? (float) str_replace(['$', ','], '', $validated['preferred_cost']) : null,
             isActive: (bool) ($validated['is_active'] ?? true),
         );
     }

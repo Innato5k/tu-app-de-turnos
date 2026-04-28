@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\patient;
+namespace App\Http\Requests\Patient;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -30,6 +30,7 @@ class UpdatePatientRequest extends FormRequest
             'postal_code' => 'nullable|string|max:20',
             'medical_coverage' => 'nullable|string|max:255',
             'preferred_modality' => 'nullable|string|max:50',
+            'preferred_cost' => 'nullable|numeric|min:0',
             'is_active' => 'required|boolean',
         ];
     }

@@ -11,13 +11,13 @@ class AvailableSlot extends Model
     use HasFactory,  SoftDeletes;
 
     protected $fillable = [
-        'user_id', 
+        'user_id',
         'start_time',
         'end_time',
-        'status', 
-        'capacity', 
+        'status',
         'capacity',
-        'notes'
+        'notes',
+        'appointment_id'
     ];
 
     /**
@@ -30,21 +30,15 @@ class AvailableSlot extends Model
         'end_time' => 'datetime',
     ];
 
-    
-    public function user() 
+
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-   
-    public function appointments()
+
+    public function appointment()
     {
-        return $this->hasMany(Appointment::class, 'available_slot_id');
+        return $this->belongsTo(Appointment::class, 'appointment_id');
     }
-
-    public function appointment() {
-    return $this->hasOne(Appointment::class, 'available_slot_id');
-}
-
-    
 }
