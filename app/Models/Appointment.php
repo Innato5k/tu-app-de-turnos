@@ -12,7 +12,9 @@ use App\Models\User;
 class Appointment extends Model
 {
     use HasFactory ,  SoftDeletes;
-    const STATUS_SCHEDULED = 'booked';
+
+    //TODO: Modificar por enum.
+    const STATUS_BOOKED = 'booked';
     const STATUS_ATTENDED  = 'attended';
     const STATUS_ABSENT    = 'absent';
     const STATUS_CANCELLED = 'cancelled'; //TODO:sacar doble ll para ocultar los cancelados

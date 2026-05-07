@@ -1,6 +1,7 @@
-import './bootstrap'; // El que trae Laravel con Axios
-import * as bootstrap from 'bootstrap'; // Importamos la librería que instalaste con Sail
-window.bootstrap = bootstrap; // LA CLAVE: Lo hacemos global para pacientes.js e index.jsimport './bootstrap';
+import './bootstrap';
+import * as bootstrap from 'bootstrap';
+window.bootstrap = bootstrap;
+
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -8,70 +9,94 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 document.addEventListener('DOMContentLoaded', () => {
     const authToken = localStorage.getItem('auth_token');
     const userInfo = localStorage.getItem('user_info');
-    const userNameDisplay = document.getElementById('userNameDisplay');
-    const logoutButton = document.getElementById('logoutButton');
-    const loginLink = document.getElementById('loginLink');
-    const linkInicio = document.getElementById('linkInicio');    
-    const linkUsuarios = document.getElementById('linkUsuarios');
-    const linkHoraiosProfesional = document.getElementById('linkHoraiosProfesional');
-    const linkMisTurnos = document.getElementById('linkMisTurnos');
-    const linkPacientes = document.getElementById('linkPacientes');
-    const linkContactos = document.getElementById('linkContactos');
+    
+    // Selectores
+    const elements = {
+        userNameDisplay: document.getElementById('userNameDisplay'),
+        logoutButton: document.getElementById('logoutButton'),
+        loginLink: document.getElementById('loginLink'),
+        userDropdown: document.getElementById('userDropdownItem'),
+        links: {
+            inicio: document.getElementById('linkInicio'),
+            usuarios: document.getElementById('linkUsuarios'),
+            horarios: document.getElementById('linkHorariosProfesional'),
+            turnos: document.getElementById('linkMisTurnos'),
+            pacientes: document.getElementById('linkPacientes'),
+            contactos: document.getElementById('linkContactos')
+        }
+    };
 
     if (authToken && userInfo) {
-        // Si hay un token y info de usuario, el usuario está "logueado" en el front-end
         try {
             const user = JSON.parse(userInfo);
-            userNameDisplay.textContent = `Hola, ${user.full_name}!`;
-            userNameDisplay.classList.remove('d-none'); // Muestra el nombre
-            logoutButton.classList.remove('d-none'); // Muestra el botón de logout
-            loginLink.classList.add('d-none'); // Oculta el enlace de login
-            linkInicio.classList.remove('d-none'); // Oculta el menú de navegación no autenticado
-            if (user.role === 'admin') { // TODO: revisar si esto es necesario o no, y si es así, ver de ocultar este link para profesionales   
-                linkUsuarios.classList.remove('d-none');//TODO: ver de ocultar este link para profesionales
+            
+            // 1. Datos de sesión
+            if (elements.userNameDisplay) {
+                elements.userNameDisplay.textContent = `Hola, ${user.full_name}!`;
+                elements.userNameDisplay.classList.remove('d-none');
             }
-            linkHoraiosProfesional.classList.remove('d-none');
-            linkMisTurnos.classList.remove('d-none');
-            linkPacientes.classList.remove('d-none');
-            linkContactos.classList.remove('d-none');
+            
+            elements.userDropdown?.classList.remove('d-none');
+            elements.logoutButton?.classList.remove('d-none');
+            elements.loginLink?.classList.add('d-none');
+
+            // 2. Control de visibilidad por Rol
+            elements.links.inicio?.classList.remove('d-none');
+            elements.links.horarios?.classList.remove('d-none');
+            elements.links.turnos?.classList.remove('d-none');
+            elements.links.pacientes?.classList.remove('d-none');
+            elements.links.contactos?.classList.remove('d-none');
+
+            // SOLO ADMIN: CRUD Usuarios
+            if (user.role === 'admin') {
+                elements.links.usuarios?.classList.remove('d-none');
+            } else {
+                elements.links.usuarios?.classList.add('d-none');
+            }
+
         } catch (e) {
             console.error("Error al parsear user_info:", e);
-            userNameDisplay.classList.add('d-none');
-            logoutButton.classList.add('d-none');
-            loginLink.classList.remove('d-none');
-            linkInicio.classList.add('d-none');
-            linkUsuarios.classList.add('d-none');
-            linkHoraiosProfesional.classList.add('d-none');
-            linkMisTurnos.classList.add('d-none');
-            linkPacientes.classList.add('d-none');
-            linkContactos.classList.add('d-none');
+            renderGuestUI(elements);
         }
     } else {
-        // Si no hay token, el usuario no está logueado
-        userNameDisplay.classList.add('d-none');
-        logoutButton.classList.add('d-none');
-        loginLink.classList.remove('d-none');
-        linkInicio.classList.add('d-none');
-        linkUsuarios.classList.add('d-none');
-        linkHoraiosProfesional.classList.add('d-none');
-        linkMisTurnos.classList.add('d-none');
-        linkPacientes.classList.add('d-none');
-        linkContactos.classList.add('d-none');
+        renderGuestUI(elements);
     }
 
-    // Manejador del botón de Cerrar Sesión
-    logoutButton.addEventListener('click', () => {
-        // Elimina el token y la info del usuario del localStorage
+    // 3. Indicador de Pantalla Activa (Active State)
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    navLinks.forEach(link => {
+        // Normalizamos los paths para comparar
+        const linkPath = link.getAttribute('href');
+        if (linkPath === currentPath) {
+            link.classList.add('active', 'fw-bold');
+            link.classList.add('text-info');
+        } else {
+            link.classList.remove('active', 'fw-bold');            
+            link.classList.remove('text-info');
+        }
+    });
+
+    // Manejador de Cerrar Sesión
+    elements.logoutButton?.addEventListener('click', (e) => {
+        e.preventDefault();
         localStorage.removeItem('auth_token');
         localStorage.removeItem('token_type');
         localStorage.removeItem('user_info');
-
-        // Redirige a la página de login (o a la raíz si el login es la raíz)
         window.location.href = "/login";
     });
 });
 
-
+function renderGuestUI(el) {
+    el.userNameDisplay?.classList.add('d-none');
+    el.userDropdown?.classList.add('d-none');
+    el.logoutButton?.classList.add('d-none');
+    el.loginLink?.classList.remove('d-none');
+    
+    // Ocultar todos los links protegidos
+    Object.values(el.links).forEach(link => link?.classList.add('d-none'));
+}
 
 document.addEventListener("DOMContentLoaded", function() {
     document.body.classList.add('loaded');

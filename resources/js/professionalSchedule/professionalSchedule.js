@@ -197,9 +197,6 @@ scheduleForm.addEventListener('submit', async function (event) {
         effective_start_date: enableDateRangeCheckbox.checked ? effective_start_date : null,
         effective_end_date: enableDateRangeCheckbox.checked ? effective_end_date : null,
     };
-
-    console.log('Datos a enviar:', scheduleData); // Para depuración, puedes eliminarlo en producción
-
     try {
         const response = await fetch(`${API_PROFESSIONALSCHEDULES_URL}`, {
             method: 'POST',

@@ -103,7 +103,6 @@ async function fetchPatients(page = 1, searchQuery = '') {
         }
 
         const data = await response.json();
-        console.log('Datos recibidos de la API:', data); // Debug: Ver la estructura de la respuesta
         populateTable(data.data); // Asume que la respuesta de la API tiene los datos en 'data.data'
         updatePagination(data); // Actualiza los controles de paginación
     } catch (error) {

@@ -65,7 +65,7 @@ class ProfessionalAppointmentsService
                 'start_time'        => $slot->start_time,
                 'end_time'          => $slotEndTime,
                 'title'             => $patient->name . ' ' . $patient->last_name,
-                'status'            => $dto->stats ?? 'booked',
+                'status'            => $dto->status ?? Appointment::STATUS_BOOKED,
                 'notes'             => $dto->notes ?? null,
                 'cost'              => $dto->cost ?? null,
                 'modality'          => $dto->modality ?? null,
@@ -119,7 +119,7 @@ class ProfessionalAppointmentsService
                 'start_time'        => $start,
                 'end_time'          => $end,
                 'title'             => $patient->name . ' ' . $patient->last_name,
-                'status'            => $dto->stats ?? 'booked',
+                'status'            => $dto->stats ?? Appointment::STATUS_BOOKED,
                 'notes'             => $dto->notes ?? null,
                 'cost'              => $dto->cost ?? null,
                 'modality'          => $dto->modality ?? null,
@@ -192,8 +192,8 @@ class ProfessionalAppointmentsService
             'cost' => $dto->cost,
             'notes' => $dto->notes,
         ]);
-     ;
-        if ($dto->status === 'cancelled') { //TODO: va a ir con una sola L
+     
+        if ($dto->status === Appointment::STATUS_CANCELLED) {
             if ($dto)
                 $slots = AvailableSlot::where('appointment_id', $id)->get();
             foreach ($slots as $slot) {
