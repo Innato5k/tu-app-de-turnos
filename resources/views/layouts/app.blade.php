@@ -17,52 +17,63 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-md navbar-light bg-light shadow-sm py-2">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
         <div class="container-fluid">
-            <!-- Botón de menú hamburguesa (visible en pantallas pequeñas) -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand" href="/dashboard">
+                <i class="bi bi-calendar-check text-primary"></i> <strong>PsicoTurnos</strong>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <!-- Logo o nombre de la app -->
-            <a class="navbar-brand ms-2 text-info fw-bold fs-5" href="#">PsicoTurnos</a>
 
-
-            <!-- Contenido de la navbar colapsable -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <ul class="navbar-nav me-auto">
+                    <!-- Todos inician con d-none, el JS los activa -->
                     <li class="nav-item">
-                        <a id="linkInicio" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/dashboard">Inicio</a>
+                        <a id="linkUsuarios" class="nav-link text-info d-none" href="/users">
+                            <i class="bi bi-person-gear"></i> Usuarios
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a id="linkUsuarios" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/users">Usuarios</a>
+                        <a id="linkMisTurnos" class="nav-link d-none" href="/schedules"><i class="bi bi-calendar3"></i> Calendario</a>
                     </li>
                     <li class="nav-item">
-                        <a id="linkMisTurnos" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/schedules">Calendario de Turnos</a>
+                        <a id="linkHorariosProfesional" class="nav-link  d-none" href="/professionalSchedules">
+                            <i class="bi bi-clock-history"></i> Horarios
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a id="linkHoraiosProfesional" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/professionalSchedules">Horarios de Atención</a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="linkPacientes" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="/patients">Mis Pacientes</a>
-                    </li>
-                    <li class="nav-item">
-                        <a id="linkContactos" class="d-none nav-link text-secondary fw-medium px-2 py-1" href="#">Contacto</a>
+                        <a id="linkPacientes" class="nav-link d-none" href="/patients"><i class="bi bi-people"></i> Pacientes</a>
                     </li>
                 </ul>
-                <!-- Parte derecha: Usuario y opciones de logout (visible en pantallas grandes) -->
-                <div class="d-flex align-items-center">
 
-                    {{-- Elementos que se mostrarán/ocultarán con JS --}}
-                    <span id="userNameDisplay" class="text-dark fw-medium me-2 d-none d-md-block small"></span>
-                    <button id="logoutButton" class="btn btn-danger btn-sm fw-semibold py-1 px-3 d-none">
-                        Cerrar Sesión
-                    </button>
-                    <a id="loginLink" href="{{ route('login') }}" class="btn btn-info btn-sm fw-semibold py-1 px-3 d-none text-white">
-                        Iniciar Sesión
-                    </a>
-                </div>
+                <ul class="navbar-nav align-items-center">
+                    <!-- Link de Login: visible solo si no hay token -->
+                    <li class="nav-item">
+                        <a id="loginLink" href="/login" class="nav-link text-info d-none">Iniciar Sesión</a>
+                    </li>
+
+                    <!-- Dropdown de Usuario: visible solo con sesión -->
+                    <li class="nav-item dropdown d-none" id="userDropdownItem">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userMenuDropdown" role="button" data-bs-toggle="dropdown">
+                            <span id="userNameDisplay" class="me-2 text-white text-capitalize"></span>
+                            <img src="/img/user-icon.png" alt="Perfil" width="32" height="32" class="rounded-circle border border-2 border-primary">
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li><a class="dropdown-item" href="/perfil/datos"><i class="bi bi-person-gear"></i> Mis datos</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <!-- Botón de logout ahora sin d-none interno, lo controla el padre -->
+                                <button id="logoutButton" class="dropdown-item text-danger border-0 bg-transparent w-100 text-start">
+                                    <i class="bi bi-box-arrow-right"></i> Cerrar sesión
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>

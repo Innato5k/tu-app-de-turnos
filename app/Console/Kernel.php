@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
     {
         //Generar los slots de turnos disponibles diariamente
         $schedule->command('slots:generate')->daily();
+        $schedule->command('appointments:mark-absent')->dailyAt('00:00');
     }
 
     /**

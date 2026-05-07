@@ -375,7 +375,6 @@ function submitReservation() {
         url = `/api/professionalAppointments/${appointmentId}`
         method = 'PUT'
     }
-    console.log("payload enviado:", payload);
     sendReservationRequest(url, method, payload);
 }
 
