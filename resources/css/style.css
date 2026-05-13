@@ -4,6 +4,10 @@ body {
     background: linear-gradient(to right bottom, #e0f7fa, #e8f5e9);
 }
 
+.bgFraseDelDía{
+    background-color: #e2b8f3 !important;
+}
+
 .btn-extra{
     background-color: #dac6ef !important;
 }
@@ -122,3 +126,37 @@ body {
 .fc-event-canceled .fc-event-title {
     text-decoration: line-through;
 }
+
+.card { transition: transform 0.2s; }
+    .card:hover { transform: translateY(-3px); }
+    
+    #quote-container p {
+        font-style: italic;
+        font-size: 1.25rem;
+        color: #555;
+    }
+    
+    .blockquote-footer {
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    .h6 {
+        font-weight: bold;
+        color: #007bff;
+        font-size: 3rem;
+    }
+
+    #announcements-container .alert {
+        border-radius: 8px;
+        font-size: 0.85rem;
+        border-left-width: 5px;
+    }
+
+    .body {
+        background: linear-gradient(to right, #f8f9fa, #e0f7fa);
+    }
+
+    .chart-area {
+        position: relative;
+    }
