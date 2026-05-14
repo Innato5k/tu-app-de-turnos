@@ -10,6 +10,7 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "simshaun/recurr": "^5.0",
         "spatie/laravel-permission": "^6.25",
         "twbs/bootstrap-icons": "^1.13",
         "tymon/jwt-auth": "2.0"

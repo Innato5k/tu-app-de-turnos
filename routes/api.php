@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ProfessionalScheduleController;
 use App\Http\Controllers\ProfessionalAppointmentsController;
+use App\Http\Controllers\DashboardController;
 
 /*
 
@@ -72,7 +73,8 @@ Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' =
     Route::post('/book', [ProfessionalAppointmentsController::class, 'book']);
     Route::post('/bookExtra', [ProfessionalAppointmentsController::class, 'bookExtra']);
 });
-// Ejemplo de una ruta protegida adicional
-Route::middleware(['jwt.auth'])->get('/user-profile', function (Request $request) {
-    return response()->json(['message' => '¡Bienvenido! Eres un usuario autenticado.', 'user' => $request->user()]);
+
+// Rutas protegidas para el Dashboard
+Route::group(['middleware' => ['jwt.auth','role:admin|professional'], 'prefix' => 'dashboard'], function () {
+    Route::get('/summary', [DashboardController::class, 'index'])->name('dashboard'); 
 });

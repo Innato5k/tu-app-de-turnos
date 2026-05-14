@@ -12,7 +12,6 @@ Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
 // Ruta para procesar el envío del formulario de login
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 
-
 Route::get('/dashboard', function () {
     return view('/dashboard'); 
 })->name('dashboard');

@@ -9,6 +9,7 @@ use App\DTOs\Appointment\AppointmentDTO;
 use App\DTOs\Appointment\AppointmentUpdateDTO;
 use App\DTOs\Appointment\ExtraAppointmentDTO;
 use App\DTOs\Patient\PatientUpdatePreferredRequestDTO;
+use App\Http\Resources\Appointment\AppointmentResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
@@ -181,6 +182,21 @@ class ProfessionalAppointmentsService
             ->first();
     }
 
+    public function findNextAppointment()
+    {
+        $userId = auth()->id();
+
+        $appointment = Appointment::with('patient:id,name,last_name')
+            ->where('user_id', $userId)
+            ->where('status', Appointment::STATUS_BOOKED) 
+            ->where('start_time', '>=', Carbon::now())
+            ->orderBy('start_time', 'asc')
+            ->first();
+        
+            return new AppointmentResource($appointment);
+        
+    }
+
     public function updateAppointment(AppointmentUpdateDTO $dto, $id)
     {
         $appointment = Appointment::findOrFail($id);
@@ -192,7 +208,7 @@ class ProfessionalAppointmentsService
             'cost' => $dto->cost,
             'notes' => $dto->notes,
         ]);
-     
+
         if ($dto->status === Appointment::STATUS_CANCELLED) {
             if ($dto)
                 $slots = AvailableSlot::where('appointment_id', $id)->get();

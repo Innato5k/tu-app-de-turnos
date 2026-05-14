@@ -78,7 +78,13 @@ document.addEventListener('DOMContentLoaded', function () {
             fetch(`/api/professionalAppointments/?start_date=${start}&end_date=${end}`, {
                 headers: { 'Authorization': 'Bearer ' + token }
             })
-                .then(response => response.json())
+                .then(response => {
+                    if (response.status === 401) {
+                        redirectToLogin('Sesión expirada.');
+                        return;
+                    }
+                    return response.json();
+                })
                 .then(json => {
                     // El Resource de Laravel devuelve la data en json.data
 
@@ -203,6 +209,10 @@ function fetchFreshAppointmentData(appointmentId, slotId, event) {
         }
     })
         .then(res => {
+            if (res.status === 401) {
+                redirectToLogin('Sesión expirada. Por favor, vuelve a ingresar.');
+                return;
+            }
             if (!res.ok) throw new Error("Error en respuesta de API");
             return res.json();
         })
@@ -377,9 +387,3 @@ function submitReservation() {
     }
     sendReservationRequest(url, method, payload);
 }
-
-
-
-
-
-
