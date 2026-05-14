@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\AvailableSlot;
 use App\Models\Appointment;
+use App\Models\BlackoutPeriod;
 use App\Services\PatientService;
 use App\DTOs\Appointment\AppointmentDTO;
 use App\DTOs\Appointment\AppointmentUpdateDTO;
@@ -148,7 +149,7 @@ class ProfessionalAppointmentsService
             $startDate = \Carbon\Carbon::parse($startRaw)->startOfDay();
             $endDate = \Carbon\Carbon::parse($endRaw)->endOfDay();
 
-            // 1. Traemos solo los slots que NO están ocupados (Disponibles o Bloqueados)
+            // 1. Traemos solo los slots que NO están ocupados (Disponibles )
             $freeSlots = AvailableSlot::where('user_id', $userId)
                 ->whereBetween('start_time', [$startDate, $endDate])
                 ->where('status', '!=', 'booked')
@@ -161,9 +162,14 @@ class ProfessionalAppointmentsService
                 ->whereBetween('start_time', [$startDate, $endDate])
                 ->get();
 
+            $blackouts = BlackoutPeriod::where('user_id', $userId)
+                ->whereBetween('start_time', [$startDate, $endDate])
+                ->orWhereBetween('end_time', [$startDate, $endDate])
+                ->get();
+
             // 3. Unimos ambas colecciones
             // Nota: El Resource deberá estar preparado para manejar ambos tipos de objeto
-            return $freeSlots->concat($appointments);
+            return $freeSlots->concat($appointments)->concat($blackouts);
         } catch (\Exception $e) {
             // Esto va a detener la ejecución y mostrarte el error exacto
             dd($e->getMessage(), $e->getFile(), $e->getLine());
@@ -188,13 +194,12 @@ class ProfessionalAppointmentsService
 
         $appointment = Appointment::with('patient:id,name,last_name')
             ->where('user_id', $userId)
-            ->where('status', Appointment::STATUS_BOOKED) 
+            ->where('status', Appointment::STATUS_BOOKED)
             ->where('start_time', '>=', Carbon::now())
             ->orderBy('start_time', 'asc')
             ->first();
-        
-            return new AppointmentResource($appointment);
-        
+
+        return new AppointmentResource($appointment);
     }
 
     public function updateAppointment(AppointmentUpdateDTO $dto, $id)

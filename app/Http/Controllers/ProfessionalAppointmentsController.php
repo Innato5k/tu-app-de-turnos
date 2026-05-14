@@ -37,6 +37,7 @@ class ProfessionalAppointmentsController extends Controller
 
     public function index(Request $request)
     {
+        
         $appointments = $this->professionalAppointmentsService->getCalendarData($request);
         return AvailableSlotResource::collection($appointments);
     }

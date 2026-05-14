@@ -36,6 +36,7 @@ class Appointment extends Model
         'notes',
         'cost',
         'modality',
+        'recurring_appointment_id',
     ];
 
     /**
@@ -77,5 +78,13 @@ class Appointment extends Model
     public function availableSlot()
     {
         return $this->belongsTo(AvailableSlot::class, 'available_slot_id');
+    }
+
+    /**
+     * Get the recurring appointment that the appointment belongs to.
+     */
+    public function recurringAppointment()
+    {
+        return $this->belongsTo(RecurringAppointment::class, 'recurring_appointment_id');
     }
 }
