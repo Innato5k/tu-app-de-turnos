@@ -4,11 +4,11 @@ body {
     background: linear-gradient(to right bottom, #e0f7fa, #e8f5e9);
 }
 
-.bgFraseDelDía{
+.bgFraseDelDía {
     background-color: #e2b8f3 !important;
 }
 
-.btn-extra{
+.btn-extra {
     background-color: #dac6ef !important;
 }
 
@@ -105,10 +105,13 @@ body {
 
 /* 5. BLOQUEADO: Gris con patrón visual */
 .fc-event-blocked {
-    background-color: #edf2f7 !important;
-    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.5) 10px, rgba(255, 255, 255, 0.5) 20px) !important;
-    border-left: 4px solid #718096 !important;
+    background-color: #e6e3e3 !important;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(236, 236, 236, 0.966) 10px, rgba(255, 255, 255, 0.5) 20px) !important;
+    border-left: 4px solid #575656 !important;
+    border-right: 4px solid #575656 !important;
+    text-decoration: underline !important;
     cursor: not-allowed;
+
 }
 
 /* 6. EXTRA: Púrpura suave para diferenciar */
@@ -123,40 +126,117 @@ body {
     border-left: 4px solid #f56565 !important;
     opacity: 0.8;
 }
+
 .fc-event-canceled .fc-event-title {
     text-decoration: line-through;
 }
 
-.card { transition: transform 0.2s; }
-    .card:hover { transform: translateY(-3px); }
-    
-    #quote-container p {
-        font-style: italic;
-        font-size: 1.25rem;
-        color: #555;
-    }
-    
-    .blockquote-footer {
-        font-weight: bold;
-        color: #007bff;
-    }
+.card {
+    transition: transform 0.2s;
+}
 
-    .h6 {
-        font-weight: bold;
-        color: #007bff;
-        font-size: 3rem;
-    }
+.card:hover {
+    transform: translateY(-3px);
+}
 
-    #announcements-container .alert {
-        border-radius: 8px;
-        font-size: 0.85rem;
-        border-left-width: 5px;
-    }
+#quote-container p {
+    font-style: italic;
+    font-size: 1.25rem;
+    color: #555;
+}
 
-    .body {
-        background: linear-gradient(to right, #f8f9fa, #e0f7fa);
-    }
+.blockquote-footer {
+    font-weight: bold;
+    color: #007bff;
+}
 
-    .chart-area {
-        position: relative;
-    }
+.h6 {
+    font-weight: bold;
+    color: #007bff;
+    font-size: 3rem;
+}
+
+#announcements-container .alert {
+    border-radius: 8px;
+    font-size: 0.85rem;
+    border-left-width: 5px;
+}
+
+.body {
+    background: linear-gradient(to right, #f8f9fa, #e0f7fa);
+}
+
+.chart-area {
+    position: relative;
+}
+
+/* --- NUEVOS ESTILOS PARA GESTIÓN DE HORARIOS --- */
+
+.day-circle {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-weight: bold;
+    font-size: 0.75rem;
+    transition: all 0.2s;
+    border-width: 2px;
+}
+
+.btn-check:checked+.day-circle {
+    background-color: #0d6efd;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
+}
+
+.schedule-card {
+    border-radius: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    border-left: 5px solid #0d6efd;
+    background: #ffffff;
+}
+
+.schedule-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.time-badge {
+    background: #e7f1ff;
+    color: #0d6efd;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.day-badge {
+    background: #f0f2f5;
+    color: #495057;
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 5px;
+    margin-right: 4px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.bg-primary-subtle {
+    background-color: #e7f1ff;
+    color: #0d6efd;
+}
+
+.bg-warning-subtle {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.card-header h5 {
+    font-size: 1rem;
+}
+
+/* Mantener tus estilos existentes de FullCalendar debajo... */

@@ -64,35 +64,28 @@ document.addEventListener('DOMContentLoaded', function () {
         eventClassNames: 'fc-event-custom', // Clase CSS personalizada para eventos
         timeZone: 'America/Argentina/Buenos_Aires',
 
-        events: function (info, successCallback, failureCallback) {
-            const token = localStorage.getItem('auth_token');
-            if (!token) {
-                redirectToLogin('No autenticado. Por favor, inicia sesión.');
-                return;
-            }
+        eventSources: [
+            // 1. Tus turnos y slots normales (lo que ya tenías)
+            {
+                events: function (info, successCallback, failureCallback) {
+                    const token = localStorage.getItem('auth_token');
+                    if (!token) return;
 
-            // FullCalendar nos da info.startStr e info.endStr automáticamente (ISO8601)
-            // Pero tu BE espera d/m/Y, así que formateamos:
-            const start = info.start.toLocaleDateString('es-AR'); // d-m-Y
-            const end = info.end.toLocaleDateString('es-AR');
-            fetch(`/api/professionalAppointments/?start_date=${start}&end_date=${end}`, {
-                headers: { 'Authorization': 'Bearer ' + token }
-            })
-                .then(response => {
-                    if (response.status === 401) {
-                        redirectToLogin('Sesión expirada.');
-                        return;
-                    }
-                    return response.json();
-                })
-                .then(json => {
-                    // El Resource de Laravel devuelve la data en json.data
+                    const start = info.start.toLocaleDateString('es-AR');
+                    const end = info.end.toLocaleDateString('es-AR');
 
-                    successCallback(json.data);
-
-                })
-                .catch(error => failureCallback(error));
-        },
+                    fetch(`/api/professionalAppointments/?start_date=${start}&end_date=${end}`, {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    })
+                        .then(res => res.json())
+                        .then(json => {
+                            console.log(json.data);
+                            successCallback(json.data);
+                        })
+                        .catch(err => failureCallback(err));
+                },
+            },
+        ],
 
         eventClick: function (info) {
             handleSlotClick(info.event);
@@ -103,13 +96,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
         //TODO: trabajar ya que puede tener 2 estados, presente/ausente/cancelado + pago/impago
         eventDidMount: function (info) {
-
             const props = info.event.extendedProps;
             const status = props.status; // 'available', 'booked', 'attended', etc.
             const payment = props.payment_status; // 'paid', 'pending'
 
             // 1. Agregamos la clase de estado (ej: fc-event-booked)
             info.el.classList.add(`fc-event-${status}`);
+            if (props.type === 'blackout') {
+                //info.el.style.backgroundColor = '#ff9f89'; // Color para bloqueos
+                info.el.classList.add(`fc-event-blocked`);
+                return; // Salimos para no aplicar lógica de pagos a un bloqueo
+            }
 
             if (props.is_extra) info.el.classList.add(`fc-event-extra`);
 
@@ -149,7 +146,7 @@ window.openExtraAppointmentModal = function () {
     showReservationModal(null, "Definir horario extra", null, null, true);
 }
 
-//TODO: Corregir , esta ok para post pero no para put       
+
 function sendReservationRequest(url, method, payload) {
     const token = localStorage.getItem('auth_token');
     if (!token) {

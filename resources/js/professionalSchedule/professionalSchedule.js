@@ -1,269 +1,196 @@
-// =====================================================================
-// 1. CONFIGURACIÓN Y VARIABLES GLOBALES
-// =====================================================================
+import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-const API_PROFESSIONALSCHEDULES_URL = '/api/professionalSchedule'; // URL base de tu API para horarios de profesionales
-const REDIRECT_LOGIN_URL = '/login'; // Ruta a la página de inicio de sesión (web)
-// Mapeo de valores de día (0-6) a nombres
+// 1. CONFIGURACIÓN
+const API_URL = '/api/professionalSchedule';
+const REDIRECT_LOGIN_URL = '/login';
+let scheduleModal;
+
 const dayNames = {
-    0: 'Domingo',
-    1: 'Lunes',
-    2: 'Martes',
-    3: 'Miércoles',
-    4: 'Jueves',
-    5: 'Viernes',
-    6: 'Sábado'
+    0: 'Dom', 1: 'Lun', 2: 'Mar', 3: 'Mié', 4: 'Jue', 5: 'Vie', 6: 'Sáb'
 };
-const scheduleForm = document.getElementById('scheduleForm');
-const enableDateRangeCheckbox = document.getElementById('enableDateRange');
-const dateRangeFields = document.getElementById('dateRangeFields');
-const schedulesTableBody = document.getElementById('schedulesTableBody');
 
-// =====================================================================
-// 2. FUNCIONES DE UTILIDAD
-// =====================================================================
+document.addEventListener('DOMContentLoaded', function () {
+    scheduleModal = new bootstrap.Modal(document.getElementById('scheduleEntryModal'));
 
-/**
- * Obtiene el token JWT del almacenamiento local.
- * @returns {string|null} El token JWT o null si no existe.
- */
+    // Listener Rango de Fechas (Tu lógica original)
+    const rangeSwitch = document.getElementById('enableDateRange');
+    const rangeFields = document.getElementById('dateRangeFields');
+    rangeSwitch.addEventListener('change', function () {
+        rangeFields.hidden = !this.checked;
+        const inputs = rangeFields.querySelectorAll('input');
+        inputs.forEach(i => this.checked ? i.setAttribute('required', 'required') : i.removeAttribute('required'));
+    });
+
+    fetchAndDisplaySchedules();
+
+    document.getElementById('scheduleForm').addEventListener('submit', handleFormSubmit);
+});
+
+// --- FUNCIONES CORE ---
+
 function getAuthToken() {
-    return localStorage.getItem('auth_token');// Para depuración, puedes eliminarlo en producción
+    return localStorage.getItem('auth_token');
 }
 
-/**
- * Redirige al usuario a la página de inicio de sesión y limpia el token.
- * @param {string} message Mensaje a mostrar al usuario.
- */
 function redirectToLogin(message) {
-    alert(message); //TODO: Considera reemplazar esto con un modal personalizado para mejor UX
+    alert(message);
     localStorage.removeItem('auth_token');
-    localStorage.removeItem('token_type');
-    localStorage.removeItem('user_info');
     window.location.href = REDIRECT_LOGIN_URL;
 }
 
-// --- Cargar horarios existentes al iniciar la página ---
-async function fetchAndDisplaySchedules() {
-    schedulesTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-info">Cargando horarios...</td></tr>';
-
-    try {
-        const token = getAuthToken();
-
-        if (!token) {
-            redirectToLogin('No autenticado. Por favor, inicia sesión.');
-            return;
-        }
-
-        const response = await fetch(`${API_PROFESSIONALSCHEDULES_URL}`, {
-            method: 'GET',
-            headers: {
-
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-
-        if (!response.ok) {
-            redirectToLogin('Datos incorrectos.'); // TODO:  comodar el mensaje correcto
-
-        }
-        const schedules = await response.json();
-
-        schedulesTableBody.innerHTML = '';
-
-        if (schedules.length === 0) {
-            schedulesTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No hay horarios cargados.</td></tr>';
-            return;
-        }
-
-        schedules.data.forEach(schedule => {
-            const row = schedulesTableBody.insertRow();
-            const daysText = dayNames[schedule.day_of_week] || 'Desconocido';
-            const startDateTime = schedule.start_time;
-            const endDateTime = schedule.end_time;
-            const effectiveStartDate = schedule.effective_start_date ? new Date(schedule.effective_start_date).toLocaleDateString() : 'Siempre';
-            const effectiveEndDate = schedule.effective_end_date ? new Date(schedule.effective_end_date).toLocaleDateString() : 'Siempre';
-
-            row.innerHTML = `
-                    <td>${daysText}</td>
-                    <td>${startDateTime.substring(0, 5)}</td>
-                    <td>${endDateTime.substring(0, 5)}</td>
-                    <td>${effectiveStartDate}</td>
-                    <td>${effectiveEndDate}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm delete-schedule" data-id="${schedule.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                            </svg>
-                        </button>
-                    </td>
-                `;
-            //TODO: Considera mejorar la presentación de las fechas y horas, por ejemplo usando una librería como date-fns o moment.js para formatear de manera consistente
-            //TODO: aplciar editar horarios
-            /*row.innerHTML = `
-                    <td>${daysText}</td>
-                    <td>${startDateTime.substring(0, 5)}</td>
-                    <td>${endDateTime.substring(0, 5)}</td>
-                    <td>${effectiveStartDate}</td>
-                    <td>${effectiveEndDate}</td>
-                    <td>
-                        <button class="btn btn-info btn-sm edit-schedule text-white" data-id="${schedule.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325"/>
-                            </svg>
-                        </button>
-                        <button class="btn btn-danger btn-sm delete-schedule" data-id="${schedule.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                            </svg>
-                        </button>
-                    </td>
-                `;*/
-        });
-        attachDeleteListeners(); // Volver a adjuntar listeners después de recargar la tabla
-    } catch (error) {
-        console.error('Error al cargar horarios:', error);
-        schedulesTableBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error al cargar horarios.</td></tr>';
-    }
+window.openScheduleModal = function () {
+    document.getElementById('scheduleForm').reset();
+    document.getElementById('dateRangeFields').hidden = true;
+    scheduleModal.show();
 }
 
-// --- Funcionalidad para mostrar/ocultar el rango de fechas ---
-enableDateRangeCheckbox.addEventListener('change', function () {
-    if (this.checked) {
-        dateRangeFields.hidden = false;
-        // Hacemos que los campos de fecha sean requeridos si están habilitados
-        document.getElementById('startDate').setAttribute('required', 'required');
-        document.getElementById('endDate').setAttribute('required', 'required');
-    } else {
-        dateRangeFields.hidden = true;
-        // Removemos el atributo required si están deshabilitados
-        document.getElementById('startDate').removeAttribute('required');
-        document.getElementById('endDate').removeAttribute('required');
-        // Limpiamos los valores al ocultar
-        document.getElementById('startDate').value = '';
-        document.getElementById('endDate').value = '';
-    }
-});
-
-
-
-// --- Guardar nuevo horario ---
-scheduleForm.addEventListener('submit', async function (event) {
-    event.preventDefault(); // Evitar el envío por defecto del formulario
+async function fetchAndDisplaySchedules() {
+    const container = document.getElementById('schedulesGrid');
     const token = getAuthToken();
-    if (!token) {
-        redirectToLogin('No autenticado. Por favor, inicia sesión.');
-        return;
-    }
 
-    const selectedDays = Array.from(document.querySelectorAll('input[type="checkbox"]:checked:not(#enableDateRange)'))
-        .map(checkbox => parseInt(checkbox.value));
+    if (!token) return redirectToLogin('No autenticado.');
 
-    if (selectedDays.length === 0) {
-        alert('Por favor, selecciona al menos un día de la semana.');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
-        return;
-    }
+    try {
+        const response = await fetch(API_URL, {
+            headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+        });
+
+        if (!response.ok) throw new Error('Error en la petición');
+
+        const result = await response.json();
+        const rawSchedules = result.data || result;
+
+
+        container.innerHTML = '';
+
+        if (rawSchedules.length === 0) {
+            container.innerHTML = '<div class="col-12 text-center text-muted">No hay horarios configurados.</div>';
+            return;
+        }
+
+        // --- LÓGICA DE ANALISTA: AGRUPAR POR DÍA ---
+        const grouped = rawSchedules.reduce((acc, curr) => {
+            const days = curr.day_of_week.split(',');
+            days.forEach(d => {
+                const dayNum = d.trim();
+                if (!acc[dayNum]) acc[dayNum] = [];
+                acc[dayNum].push(curr);
+            });
+            return acc;
+        }, {});
+
+        const sortedDays = Object.keys(grouped).sort((a, b) => (a == 0 ? 7 : a) - (b == 0 ? 7 : b));
+
+        sortedDays.forEach(dayNum => {
+            const dayCard = document.createElement('div');
+            dayCard.className = 'col-12 col-xl-10 mb-3'; // Tarjeta ancha centrada
+
+            // Ordenar horarios del mismo día por hora de inicio
+            const daySchedules = grouped[dayNum].sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+            const itemsHtml = daySchedules.map(s => {
+                const isTemporal = s.effective_start_date || s.effective_end_date;
+                return `
+            <div class="d-flex align-items-center p-3 mb-2 bg-white rounded border-start ${isTemporal ? 'border-warning border-4' : 'border-primary border-4'} shadow-sm">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center">
+                        <h5 class="mb-0 fw-bold text-dark me-3">${s.start_time.substring(0, 5)} - ${s.end_time.substring(0, 5)}</h5>
+                        ${isTemporal ? '<span class="badge bg-warning text-dark px-2 py-1" style="font-size:0.7rem">TEMPORAL</span>' : '<span class="badge bg-primary-subtle text-primary px-2 py-1" style="font-size:0.7rem">FIJO</span>'}
+                    </div>
+                    ${isTemporal ? `
+                        <div class="small text-muted mt-1">
+                            <i class="far fa-calendar-alt me-1"></i> Vigencia: 
+                            ${s.effective_start_date || '...'} hasta ${s.effective_end_date || '...'}
+                        </div>` : ''}
+                </div>
+                <button class="btn btn-outline-danger btn-sm border-0 rounded-circle" onclick="deleteSchedule(${s.id})">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        `;
+            }).join('');
+
+            dayCard.innerHTML = `
+        <div class="card border-0 shadow-sm overflow-hidden" style="background-color: #f8f9fa;">
+            <div class="card-body p-0">
+                <div class="row g-0">
+                    <div class="col-md-2 bg-dark text-white d-flex align-items-center justify-content-center py-3">
+                        <div class="text-center">
+                            <div class="text-uppercase small opacity-75">Día</div>
+                            <div class="fs-4 fw-bold">${dayNames[dayNum]}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-10 p-3">
+                        ${itemsHtml}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+            container.appendChild(dayCard);
+        });
+
+    } catch (error) { /* ... manejo error ... */ }
+}
+
+async function handleFormSubmit(e) {
+    e.preventDefault();
+    const token = getAuthToken();
+
+    const selectedDays = Array.from(document.querySelectorAll('.day-checkbox:checked')).map(cb => parseInt(cb.value));
+    if (selectedDays.length === 0) return alert('Seleccioná al menos un día.');
 
     const startTime = document.getElementById('startTime').value;
     const endTime = document.getElementById('endTime').value;
-    const effective_start_date = document.getElementById('startDate').value;
-    const effective_end_date = document.getElementById('endDate').value;
 
-    // Validación básica de horas
-    if (startTime >= endTime) {
-        alert('La hora de inicio debe ser anterior a la hora de fin.');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
-        return;
-    }
+    if (startTime >= endTime) return alert('La hora de inicio debe ser anterior a la de fin.');
 
-    // Validación básica de fechas si están habilitadas
-    if (enableDateRangeCheckbox.checked) {
-        if (!startDate || !endDate) {
-            alert('Por favor, ingresa ambas fechas para el rango.');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
-            return;
-        }
-        if (new Date(startDate) > new Date(endDate)) {
-            alert('La fecha de inicio debe ser anterior o igual a la fecha de fin.');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
-            return;
-        }
-    }
-
-    const scheduleData = {
+    const payload = {
         days_of_week: selectedDays,
         start_time: startTime,
         end_time: endTime,
-        effective_start_date: enableDateRangeCheckbox.checked ? effective_start_date : null,
-        effective_end_date: enableDateRangeCheckbox.checked ? effective_end_date : null,
+        effective_start_date: document.getElementById('enableDateRange').checked ? document.getElementById('startDate').value : null,
+        effective_end_date: document.getElementById('enableDateRange').checked ? document.getElementById('endDate').value : null
     };
+
     try {
-        const response = await fetch(`${API_PROFESSIONALSCHEDULES_URL}`, {
+        const response = await fetch(API_URL, {
             method: 'POST',
             headers: {
-                'Accept': 'application/json',
                 'Content-Type': 'application/json',
+                'Accept': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify(scheduleData)
+            body: JSON.stringify(payload)
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || ''}`);
+        if (response.ok) {
+            alert('Horario guardado con éxito!');
+            scheduleModal.hide();
+            fetchAndDisplaySchedules();
+        } else {
+            const err = await response.json();
+            alert('Error: ' + (err.message || 'No se pudo guardar'));
         }
-
-        alert('Horario guardado con éxito!');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
-        scheduleForm.reset(); // Limpiar formulario
-        enableDateRangeCheckbox.checked = false; // Desmarcar rango de fechas
-        dateRangeFields.classList.add('hidden'); // Ocultar campos de rango
-        fetchAndDisplaySchedules(); // Recargar la tabla de horarios
     } catch (error) {
-        console.error('Error al guardar horario:', error);
-        alert('Hubo un error al guardar el horario: ' + error.message);//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
+        alert('Error de conexión con el servidor');
     }
-});
-
-// --- Eliminar horario ---
-function attachDeleteListeners() {
-    const token = getAuthToken();
-
-    if (!token) {
-        redirectToLogin('No autenticado. Por favor, inicia sesión.');
-        return;
-    }
-    document.querySelectorAll('.delete-schedule').forEach(button => {
-        button.onclick = async function () {
-            if (!confirm('¿Estás seguro de que quieres eliminar este horario?')) {
-                return;
-            }
-            const scheduleId = this.dataset.id;
-            try {
-                const response = await fetch(`${API_PROFESSIONALSCHEDULES_URL}/${scheduleId}`, { // Reemplaza con tu ruta de API
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${token}` // Envía el token JWT
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || ''}`);
-                }
-
-                alert('Horario eliminado con éxito!');//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
-                fetchAndDisplaySchedules(); // Recargar la tabla
-            } catch (error) {
-                console.error('Error al eliminar horario:', error);
-                alert('Hubo un error al eliminar el horario: ' + error.message);//TODO: Considera reemplazar esto con un modal personalizado para mejor UX
-            }
-        };
-    });
 }
 
+window.deleteSchedule = async function (id) {
+    if (!confirm('¿Eliminar este rango horario?')) return;
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Cargar los horarios al cargar la página por primera vez
-    fetchAndDisplaySchedules();
-});
+    const token = getAuthToken();
+    try {
+        const response = await fetch(`${API_URL}/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+            fetchAndDisplaySchedules();
+        }
+    } catch (error) {
+        alert('Error al eliminar');
+    }
+}
